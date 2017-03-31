@@ -13,37 +13,36 @@ async def on_ready():
 	print("piB0t logged in")
 
 
-@pibot.command()
-async def ls(*args):
+@pibot.command(pass_context=True)
+async def ls(ctx, *, args):
 	print(args)
-	topic = format(args[0])
-	print(len(topic))
-	if topic == "help":
-		return await pibot.say("Command list: ;tw ;yt ;dd ;py ;dpy ;ti ;pyg"
-								"\n\nType ;ls \"command\" for help on that topic.")
-	elif topic == "tw":
-		return await pibot.say("This command is used to link a twitch user's stream."
-								"\n\n<syntax> ;tw \"username\"")
-	elif topic == "yt":
-		return await pibot.say("This command is used to link youtube searches."
-								"\n\n<syntax> ;yt \"term1\" \"term2\" \"term3\"")
-	elif topic == "dd":
-		return await pibot.say("This command is used to link Duck Duck Go searches."
-								"\n\n<syntax> ;dd \"term1\" \"term2\" \"term3\"")
-	elif topic == "py":
-		return await pibot.say("This command is used to link Python documentation searches."
-								"\n\n<syntax> ;py \"term1\" \"term2\" \"term3\"")
-	elif topic == "dpy":
-		return await pibot.say("This command is used to link discord.py documentation searches."
-								"\n\n<syntax> ;dpy \"term1\" \"term2\" \"term3\"")
-	elif topic == "ti":
-		return await pibot.say("This command is used to post the local time of the bot (usually eastern)."
-								"\n\n<syntax> ;ti [does not take arguments]")
-	elif topic == "pyg":
-		return await pibot.say("This command is a simple piglatin translator."
-								"\n\n<syntax> ;pyg \"word\"")
+	print(len(args))
+	if args == "help":
+		return await pibot.send_message(ctx.message.author, "Command list: ;tw ;yt ;dd ;py ;dpy ;ti ;pyg"
+										"\n\nType ;ls \"command\" for help on that topic.")
+	elif args == "tw":
+		return await pibot.send_message(ctx.message.author, "This command is used to link a twitch user's stream."
+										"\n\n<syntax> ;tw \"username\"")
+	elif args == "yt":
+		return await pibot.send_message(ctx.message.author, "This command is used to link youtube searches."
+										"\n\n<syntax> ;yt \"term1\" \"term2\" \"term3\"")
+	elif args == "dd":
+		return await pibot.send_message(ctx.message.author, "This command is used to link Duck Duck Go searches."
+										"\n\n<syntax> ;dd \"term1\" \"term2\" \"term3\"")
+	elif args == "py":
+		return await pibot.send_message(ctx.message.author, "This command is used to link Python documentation searches."
+										"\n\n<syntax> ;py \"term1\" \"term2\" \"term3\"")
+	elif args == "dpy":
+		return await pibot.send_message(ctx.message.author, "This command is used to link discord.py documentation searches."
+										"\n\n<syntax> ;dpy \"term1\" \"term2\" \"term3\"")
+	elif args == "ti":
+		return await pibot.send_message(ctx.message.author, "This command is used to post the local time of the bot (usually eastern)."
+										"\n\n<syntax> ;ti [does not take arguments]")
+	elif args == "pyg":
+		return await pibot.send_message(ctx.message.author, "This command is a simple piglatin translator."
+										"\n\n<syntax> ;pyg \"word\"")
 	else:
-		return await pibot.say("Invalid help topic.")
+		return await pibot.send_message(ctx.message.author, "Invalid help topic. Try using ;ls help.")
 
 @pibot.command()
 async def tw(*args):
