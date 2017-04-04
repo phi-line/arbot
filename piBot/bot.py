@@ -56,7 +56,7 @@ async def yt(*args):
 	url = ("https://www.youtube.com/results?search_{}".format(
 				urlencode({'query': ' '.join(args)})
 			))
-	return await pibot.say(url)
+	return await pibot.say(url, delete_after=10)
 
 @pibot.command()
 async def dd(*args):
@@ -64,7 +64,7 @@ async def dd(*args):
 	url = ("https://duckduckgo.com/?{}".format(
 				urlencode({'q': ' '.join(args)})
 			))
-	return await pibot.say(url)
+	return await pibot.say(url, delete_after=10)
 
 @pibot.command()
 async def py(*args):
@@ -73,7 +73,7 @@ async def py(*args):
 			"&check_keywords=yes&area=default".format(
 				urlencode({'q': ' '.join(args)})
 			))
-	return await pibot.say(url)
+	return await pibot.say(url, delete_after=10)
 
 @pibot.command()
 async def dpy(*args):
@@ -82,7 +82,7 @@ async def dpy(*args):
 			"&check_keywords=yes&area=default".format(
 				urlencode({'q': ' '.join(args)})
 			))
-	return await pibot.say(url)
+	return await pibot.say(url, delete_after=10)
 
 @pibot.command()
 async def ti(*args):
@@ -90,7 +90,7 @@ async def ti(*args):
 	print(now)
 	return await pibot.say("piB0t time (eastern) is %s:%s:%s   %s/%s/%s"
 							% (now.hour, now.minute, now.second, now.month,
-							now.day, now.year))
+							now.day, now.year), delete_after=10)
 
 @pibot.command()
 async def pyg(*args):
@@ -102,6 +102,6 @@ async def pyg(*args):
 		return await pibot.say('Your word is: ' + latin)
 	else:
 		print('invalid word')
-		return await pibot.say('That isn\'t a word, stupid!')
+		return await pibot.say('That isn\'t a word.', delete_after=10)
 
 pibot.run(secrets.BOT_TOKEN)
