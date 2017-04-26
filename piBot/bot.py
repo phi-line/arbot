@@ -5,12 +5,12 @@ from discord.ext.commands import Bot
 
 import secrets
 
-pibot = Bot(command_prefix=";")
+pibot = Bot(command_prefix="!")
 
 
 @pibot.async_event
 async def on_ready():
-	print("piB0t logged in")
+	print("snek-bot logged in")
 
 
 @pibot.command(pass_context=True)
@@ -18,31 +18,41 @@ async def ls(ctx, *, args):
 	print(args)
 	print(len(args))
 	if args == "help":
-		return await pibot.send_message(ctx.message.author, "Command list: ;tw ;yt ;dd ;py ;dpy ;ti ;pyg"
-										"\n\nType ;ls \"command\" for help on that topic.")
+		return await pibot.send_message(ctx.message.author, 
+			    "Command list: !tw !yt !dd !py !dpy !ti !pyg"
+				"\n\nType !ls \"command\" for help on that topic.")
 	elif args == "tw":
-		return await pibot.send_message(ctx.message.author, "This command is used to link a twitch user's stream."
-										"\n\n<syntax> ;tw \"username\"")
+		return await pibot.send_message(ctx.message.author, 
+				"This command is used to link a twitch user's stream."
+				"\n\n<syntax> !tw \"username\"")
 	elif args == "yt":
-		return await pibot.send_message(ctx.message.author, "This command is used to link youtube searches."
-										"\n\n<syntax> ;yt \"term1\" \"term2\" \"term3\"")
+		return await pibot.send_message(ctx.message.author, 
+				"This command is used to link youtube searches."
+				"\n\n<syntax> !yt \"term1\" \"term2\" \"term3\"")
 	elif args == "dd":
-		return await pibot.send_message(ctx.message.author, "This command is used to link Duck Duck Go searches."
-										"\n\n<syntax> ;dd \"term1\" \"term2\" \"term3\"")
+		return await pibot.send_message(ctx.message.author, 
+			    "This command is used to link Duck Duck Go searches."
+				"\n\n<syntax> !dd \"term1\" \"term2\" \"term3\"")
 	elif args == "py":
-		return await pibot.send_message(ctx.message.author, "This command is used to link Python documentation searches."
-										"\n\n<syntax> ;py \"term1\" \"term2\" \"term3\"")
+		return await pibot.send_message(ctx.message.author, 
+				"This command is used to link Python documentation searches."
+				"\n\n<syntax> !py \"term1\" \"term2\" \"term3\"")
 	elif args == "dpy":
-		return await pibot.send_message(ctx.message.author, "This command is used to link discord.py documentation searches."
-										"\n\n<syntax> ;dpy \"term1\" \"term2\" \"term3\"")
+		return await pibot.send_message(ctx.message.author, 
+				"This command is used to link discord.py documentation searches."
+				"\n\n<syntax> !dpy \"term1\" \"term2\" \"term3\"")
 	elif args == "ti":
-		return await pibot.send_message(ctx.message.author, "This command is used to post the local time of the bot (usually eastern)."
-										"\n\n<syntax> ;ti [does not take arguments]")
-	elif args == "pyg":
-		return await pibot.send_message(ctx.message.author, "This command is a simple piglatin translator."
-										"\n\n<syntax> ;pyg \"word\"")
+		return await pibot.send_message(ctx.message.author, 
+				"This command is used to post the local time of the bot (usually pacific)."
+				"\n\n<syntax> !ti")
+	elif args == "wtp":
+		return await pibot.send_message(ctx.message.author,
+				"This command is used to play the Who's that Pokemon game. Players will"
+                "race to guess Pokemon sillouettes."
+                "\n\n<syntax> !wtp")
 	else:
-		return await pibot.send_message(ctx.message.author, "Invalid help topic. Try using ;ls help.")
+		return await pibot.send_message(ctx.message.author, 
+				"Invalid help topic. Try using !ls help.")
 
 @pibot.command()
 async def tw(*args):
@@ -88,20 +98,12 @@ async def dpy(*args):
 async def ti(*args):
 	now = datetime.now()
 	print(now)
-	return await pibot.say("piB0t time (eastern) is %s:%s:%s   %s/%s/%s"
+	return await pibot.say("piB0t time is %s:%s:%s PST  %s/%s/%s"
 							% (now.hour, now.minute, now.second, now.month,
 							now.day, now.year), delete_after=10)
 
 @pibot.command()
-async def pyg(*args):
-	print(args)
-	word = format(args[0])
-	latin = word.lower()[1:len(word.lower())] + word.lower()[0] + 'ay'
-	if len(word) > 0 and word.isalpha():
-		print(latin)
-		return await pibot.say('Your word is: ' + latin)
-	else:
-		print('invalid word')
-		return await pibot.say('That isn\'t a word.', delete_after=10)
+async def wtp(*args):
+    return await pibot.say("[Pokemon game code goes here]", delete_after=10)
 
 pibot.run(secrets.BOT_TOKEN)
