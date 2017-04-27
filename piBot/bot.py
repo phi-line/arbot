@@ -2,15 +2,16 @@ from datetime import datetime
 from urllib.parse import urlencode
 
 from discord.ext.commands import Bot
-
 import secrets
+
+from pokemon import pkmn
 
 pibot = Bot(command_prefix="!")
 
 
 @pibot.async_event
 async def on_ready():
-	print("snek-bot logged in")
+	print("abra-bot logged in")
 
 
 @pibot.command(pass_context=True)
@@ -104,6 +105,10 @@ async def ti(*args):
 
 @pibot.command()
 async def wtp(*args):
-    return await pibot.say("[Pokemon game code goes here]", delete_after=10)
+    if not pkmn.LOCK:
+        p = pkmn()
+        #display welcome message
+        await pibot.say(pkmn.get_img_path(), delete_after=10)
+    return
 
 pibot.run(secrets.BOT_TOKEN)
