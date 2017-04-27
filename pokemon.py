@@ -10,19 +10,12 @@ Features might include something that lets you guess from a
 specific gen of pokemon rather than all of them. For nows we will
 only include gen one
 '''
-import os
+from os import listdir
+from os.path import isfile, join, dirname, abspath
 import re
 from random import randint
 
 from PokeAPI import PokeAPI
-papi = PokeAPI() #ayeee papiii
-
-LOCK = False
-
-PATH = "/sugimori/"
-TIME_TO_START = 5
-TIME_TO_GUESS = 30
-MAX_PKMN = 721
 
 MESSAGE = "You are now playing Who's That Pokemon" \
           "\n Guess the pokemon in the shadow to win."
@@ -32,20 +25,27 @@ class pkmn(object):
         It also contains functions to output a sillouetted image
         of a given pokemon (filename)
     '''
-    def __init__(self, arg):
+    papi = PokeAPI()  # ayeee papiii
+
+    LOCK = False
+
+    PATH = "sugimori"
+    TIME_TO_START = 5
+    TIME_TO_GUESS = 30
+    MAX_PKMN = 721
+
+    def __init__(self):
         super(pkmn, self).__init__()
 
         self.pkmn_data = None
         self.pkmn_id = 0
         self.pkmn_name = ''
 
-        self.arg = arg
+        self.initialize() #initialize random id and derived name
 
-        self.init() #initialize random id and derived name
-
-    def init(self):
+    def initialize(self):
         id = pkmn.generate_id()
-        data = papi.get_pokemon(id)
+        data = pkmn.papi.get_pokemon(id)
         name = data['name']
 
         self.pkmn_data = data
@@ -60,23 +60,27 @@ class pkmn(object):
 
     def display_img(self, silhouette = False):
         #from folder return the appropriate image path to the pokemon
-
+        return pkmn.get_img_path(self.pkmn_id)
         #if sihouette edit the image to mask the pokemon in question
-        return
 
     def check_guess(self, guess):
-        if guess == self.pknn_name:
+        if guess == self.pkmn_name:
             return True
         else: return False
 
-    def get_img_path(self):
-        files = [f for f in os.listdir(PATH) if self.pkmn_id in f]
-        print (files)
-        return files[0]
+    @staticmethod
+    def get_img_path(id):
+        path = join(dirname(abspath(__file__)), pkmn.PATH)
+        try:
+            files = [f for f in listdir(path) if str(id) in f]
+            return listdir(join(path, files[0]))
+        except: # FileNotFoundError or TypeError
+            print("Could not find - ", listdir(path))
+        return path
 
     @staticmethod
     def generate_id():
-        return randint(1, MAX_PKMN)
+        return randint(1, pkmn.MAX_PKMN)
 
 '''
 Design flow:
