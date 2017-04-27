@@ -1,18 +1,21 @@
+import os
+from os.path import isfile, join, dirname, abspath
 from datetime import datetime
 from urllib.parse import urlencode
 
+import discord
 from discord.ext.commands import Bot
 import secrets
 
 from pokemon import pkmn
 
 pibot = Bot(command_prefix="!")
+client = discord.Client()
 
 
 @pibot.async_event
 async def on_ready():
-	print("abra-bot logged in")
-
+    print("Logged in as snek-bot")
 
 @pibot.command(pass_context=True)
 async def ls(ctx, *, args):
@@ -54,6 +57,16 @@ async def ls(ctx, *, args):
 	else:
 		return await pibot.send_message(ctx.message.author, 
 				"Invalid help topic. Try using !ls help.")
+
+@pibot.command(pass_context=True)
+async def wtp(message):
+    print(message)
+    if not pkmn.LOCK:
+        p = pkmn()
+        #display welcome message
+        await pibot.say(p.display_message())
+        #await client.send_message(message.channel,p.display_img())
+    return
 
 @pibot.command()
 async def tw(*args):
@@ -102,13 +115,5 @@ async def ti(*args):
 	return await pibot.say("piB0t time is %s:%s:%s PST  %s/%s/%s"
 							% (now.hour, now.minute, now.second, now.month,
 							now.day, now.year), delete_after=10)
-
-@pibot.command()
-async def wtp(*args):
-    if not pkmn.LOCK:
-        p = pkmn()
-        #display welcome message
-        await pibot.say(pkmn.get_img_path(), delete_after=10)
-    return
 
 pibot.run(secrets.BOT_TOKEN)
