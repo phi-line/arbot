@@ -11,11 +11,12 @@ specific gen of pokemon rather than all of them. For nows we will
 only include gen one
 '''
 from os import listdir
-from os.path import isfile, join, dirname, abspath
+from os.path import isfile, join, dirname, abspath, basename
 import re
 from random import randint
 
 from PokeAPI import PokeAPI
+from PIL import Image
 
 MESSAGE = "You are now playing Who's That Pokemon" \
           "\n Guess the pokemon in the shadow to win."
@@ -29,7 +30,9 @@ class pkmn(object):
 
     LOCK = False
 
-    PATH = "sugimori"
+    DEX = "sugimori"
+    KURO = "kuro_cache"
+
     TIME_TO_START = 5
     TIME_TO_GUESS = 30
     MAX_PKMN = 721
@@ -59,9 +62,12 @@ class pkmn(object):
         return MESSAGE
 
     def display_img(self, silhouette = False):
-        #from folder return the appropriate image path to the pokemon
-        return pkmn.get_img_path(self.pkmn_id)
         #if sihouette edit the image to mask the pokemon in question
+        if silhouette:
+            return self.generate_silhouette(self.get_img_path(self.pkmn_id))
+
+        #from folder return the appropriate image path to the pokemon
+        return self.get_img_path(self.pkmn_id)
 
     def check_guess(self, guess):
         if guess == self.pkmn_name:
@@ -69,8 +75,8 @@ class pkmn(object):
         else: return False
 
     @staticmethod
-    def get_img_path(id):
-        path = join(dirname(abspath(__file__)), pkmn.PATH)
+    def get_img_path(id, folder=DEX):
+        path = join(dirname(abspath(__file__)), folder)
         files = []
         try:
             files = [f for f in listdir(path) if str(id) in f]
@@ -84,6 +90,32 @@ class pkmn(object):
     @staticmethod
     def generate_id():
         return randint(1, pkmn.MAX_PKMN)
+
+    @staticmethod
+    def generate_silhouette(image_path, folder=KURO):
+        filename = basename(image_path)
+        new_path = join(dirname(abspath(__file__)), folder, filename)
+        # don't do any work if there is already an image cached
+        if isfile(new_path):
+            return new_path
+
+        #converts image to rgba pixel data
+        image = Image.open(image_path).convert('RGBA')
+        pixel_data = list(image.getdata())
+
+        #changes each solid pixel to a black one
+        for i,pixel in enumerate(pixel_data):
+            if pixel[:3] >= (0,0,0) and pkmn.almostEquals(pixel[3], 255): #pixel[3] >= 10
+                pixel_data[i] = (0,0,0,255)
+        image.putdata(pixel_data)
+        image.save(new_path)
+
+        #returns the path at the end to be referenced
+        return new_path
+
+    @staticmethod
+    def almostEquals(a, b, thres=50):
+        return abs(a - b) < thres
 
 '''
 Design flow:
