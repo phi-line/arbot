@@ -71,12 +71,15 @@ class pkmn(object):
     @staticmethod
     def get_img_path(id):
         path = join(dirname(abspath(__file__)), pkmn.PATH)
+        files = []
         try:
             files = [f for f in listdir(path) if str(id) in f]
-            return listdir(join(path, files[0]))
-        except: # FileNotFoundError or TypeError
-            print("Could not find - ", listdir(path))
-        return path
+        except FileNotFoundError:
+            print("Could not find in ", path)
+        except TypeError:
+            print("Wrong type dummy")
+        finally:
+            return join(path, files[0])
 
     @staticmethod
     def generate_id():
