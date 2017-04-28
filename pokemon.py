@@ -18,6 +18,8 @@ from random import randint
 from PokeAPI import PokeAPI
 from PIL import Image
 
+import zlib
+
 MESSAGE = "You are now playing Who's That Pokemon" \
           "\n Guess the pokemon in the shadow to win."
 
@@ -31,6 +33,7 @@ class pkmn(object):
     LOCK = False
 
     DEX = "sugimori"
+    COMPRESS='compress_cache'
     KURO = "kuro_cache"
 
     TIME_TO_START = 5
@@ -61,7 +64,7 @@ class pkmn(object):
     def display_message(self):
         return MESSAGE
 
-    def display_img(self, silhouette = False):
+    def display_img(self, silhouette = False, compress = False):
         #if sihouette edit the image to mask the pokemon in question
         if silhouette:
             return self.generate_silhouette(self.get_img_path(self.pkmn_id))
@@ -105,7 +108,7 @@ class pkmn(object):
 
         #changes each solid pixel to a black one
         for i,pixel in enumerate(pixel_data):
-            if pixel[:3] >= (0,0,0) and pkmn.almostEquals(pixel[3], 255): #pixel[3] >= 10
+            if pixel[:3] >= (0,0,0) and pkmn.almost_equals(pixel[3], 255): #pixel[3] >= 10
                 pixel_data[i] = (0,0,0,255)
         image.putdata(pixel_data)
         image.save(new_path)
@@ -114,8 +117,24 @@ class pkmn(object):
         return new_path
 
     @staticmethod
-    def almostEquals(a, b, thres=50):
+    def almost_equals(a, b, thres=50):
         return abs(a - b) < thres
+
+    @staticmethod
+    def compress_image(image_path, folder=COMPRESS, compression_rate=9):
+        filename = basename(image_path)
+        new_path = join(dirname(abspath(__file__)), folder, filename)
+
+        if isfile(new_path):
+            return new_path
+
+        with open(filename, "rb") as in_file:
+            compressed = zlib.compress(in_file.read(), compression_rate)
+
+        with open(new_path, "wb") as out_file:
+            out_file.write(compressed)
+
+        return new_path
 
 '''
 Design flow:
