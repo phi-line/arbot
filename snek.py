@@ -72,7 +72,7 @@ async def wtp(ctx):
         await pibot.say(p.display_message())
 
         # upload file
-        await pibot.upload(p.display_img())
+        await pibot.upload(p.display_img(silhouette=True))
         # await pibot.send_file(ctx.message ,p.display_img())
     return
 
