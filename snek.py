@@ -13,11 +13,12 @@ from pokemon import pkmn
 client = discord.Client()
 pybot = Bot(command_prefix="!")
 # pybot = commands.Bot(command_prefix='!')
-bot_name = 'snek-bot'
+bot_name = 'abra-bot'
 
 @pybot.async_event
 async def on_ready():
     print("Logged in as {}".format(bot_name))
+    await pybot.edit_profile(username=bot_name)
 
 @pybot.command(pass_context=True)
 async def ls(ctx, *, args):
@@ -53,9 +54,13 @@ async def ls(ctx, *, args):
                                         "\n\n<syntax> !ti")
     elif args == "wtp":
         return await pybot.send_message(ctx.message.author,
-                                        "This command is used to play the Who's that Pokemon game. Players will"
+                                        "This command is used to play the Who's that Pokemon game. Players will "
                                         "race to guess Pokemon sillouettes."
-                                        "\n\n<syntax> !wtp")
+                                        "\n\n<syntax> !wtp (gen #)")
+    elif arge == "dex":
+        return await pybot.send_message(ctx.message.author,
+                                        "This command is used to give dex info about the Pokemon"
+                                        "\n\n<syntax> !dex [pknn #] / [pkmn name]")
     else:
         return await pybot.send_message(ctx.message.author,
                                         "Invalid help topic. Try using !ls help.")
@@ -66,7 +71,7 @@ TIME = 15
 @pybot.command(pass_context=True)
 async def wtp(ctx, *args):
     if not p.LOCK:
-        gen = -1
+        gen = 0
         if args and len(args) is 1 and args[0].isdigit():
             gen = int(args[0])
         p.initialize(gen=gen)
@@ -86,7 +91,7 @@ async def wtp(ctx, *args):
         def check(msg):
             return msg.author != (bot_name) and \
                    re.match(r'^\S+$', msg.content) and \
-                   msg.content != '!wtp'
+                   not msg.content.startswith('!')
 
         def check_guess(guess):
             guess_str = guess.content.lower()
@@ -114,6 +119,38 @@ async def wtp(ctx, *args):
 
     else: print("A game is currently in session")
     return
+
+@pybot.command()
+async def dex(*args):
+    pkmn_id = 0; pkmn_name = ''; pkmn_genus = ''; pkmn_desc = ''
+    if not p.LOCK:
+        #pokemon number given
+        if args and len(args) == 1:
+            t = args[0]
+            if type(t) == int or type(t) == str:
+                p.LOCK = True
+
+                pkmn = p.papi.get_pokemon_species(t)
+                pkmn_id = pkmn['id']
+                pkmn_name = pkmn['name'].capitalize()
+                pkmn_genus = pkmn['genera'][0]['genus'] #lang: en
+                pkmn_desc = pkmn['flavor_text_entries'][1]['flavor_text']
+
+                p.initialize(id=pkmn_id)
+
+                title = "[#{0}] {1} - the {2} Pokemon:".format(pkmn_id, pkmn_name,
+                                                                       pkmn_genus)
+                color_img = await pybot.upload(p.display_img())
+
+                embed = discord.Embed(title=title, description=pkmn_desc, color=0xe74c3c,)
+                #embed.set_footer()
+                msg =  await pybot.say(embed=embed)
+
+                p.LOCK = False
+    else:
+        print("The dex is currently in use")
+    return
+
 
 
 @pybot.command()
