@@ -11,7 +11,7 @@ specific gen of pokemon rather than all of them. For nows we will
 only include gen one
 '''
 from os import listdir
-from os.path import isfile, join, dirname, abspath, basename
+from os.path import isfile, join, dirname, abspath, basename, splitext
 import re
 from random import randint
 
@@ -51,7 +51,7 @@ class pkmn(object):
 
     def initialize(self):
         id = pkmn.generate_id()
-        data = pkmn.papi.get_pokemon(id)
+        data = self.papi.get_pokemon(id)
         name = data['name']
 
         self.pkmn_data = data
@@ -65,12 +65,20 @@ class pkmn(object):
         return MESSAGE
 
     def display_img(self, silhouette = False, compress = False):
-        #if sihouette edit the image to mask the pokemon in question
-        if silhouette:
-            return self.generate_silhouette(self.get_img_path(self.pkmn_id))
+        # #if sihouette edit the image to mask the pokemon in question
+        # if silhouette:
+        #     return self.generate_silhouette(self.get_img_path(self.pkmn_id))
+        #
+        # #from folder return the appropriate image path to the pokemon
+        # return self.get_img_path(self.pkmn_id)
 
-        #from folder return the appropriate image path to the pokemon
-        return self.get_img_path(self.pkmn_id)
+        img = self.get_img_path(self.pkmn_id)
+        # if compress:
+        #     img = self.compress_image(img)
+        if silhouette:
+            img = self.generate_silhouette(img)
+        return img
+
 
     def check_guess(self, guess):
         if guess == self.pkmn_name:
@@ -81,13 +89,16 @@ class pkmn(object):
     def get_img_path(id, folder=DEX):
         path = join(dirname(abspath(__file__)), folder)
         files = []
-        try:
-            files = [f for f in listdir(path) if str(id) in f]
+        #files = [f for f in listdir(path) if ''.join(str(id), splitext(f)) in f]
+        try:!wtp
+            files = [f for f in listdir(path) if ''.join((str(id),splitext(f)[1])) == f]
+            #files = [f for f in listdir(path) if str(id) in f]
         except FileNotFoundError:
-            print("Could not find in ", path)
+            print("Could not find {} in {}".format(id, path))
         except TypeError:
-            print("Wrong type dummy")
+            print("Type error {} in {}".format(id, path))
         finally:
+            files.sort(key=len)
             return join(path, files[0])
 
     @staticmethod
@@ -121,14 +132,15 @@ class pkmn(object):
         return abs(a - b) < thres
 
     @staticmethod
-    def compress_image(image_path, folder=COMPRESS, compression_rate=9):
+    def compress_image(image_path, input=DEX, output=COMPRESS, compression_rate=9):
         filename = basename(image_path)
-        new_path = join(dirname(abspath(__file__)), folder, filename)
+        old_path = join(dirname(abspath(__file__)), input, filename)
+        new_path = join(dirname(abspath(__file__)), output, filename)
 
         if isfile(new_path):
             return new_path
 
-        with open(filename, "rb") as in_file:
+        with open(old_path, "rb") as in_file:
             compressed = zlib.compress(in_file.read(), compression_rate)
 
         with open(new_path, "wb") as out_file:
