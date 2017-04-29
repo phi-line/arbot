@@ -37,7 +37,7 @@ class pkmn(object):
     TIME_TO_GUESS = 30
     MAX_PKMN = 721
 
-    MESSAGE = "You are now playing Who's That Pokemon" \
+    MESSAGE = "You are now playing Who's That Pokemon!" \
               "\n Guess the pokemon in the shadow to win."
 
     def __init__(self):
@@ -50,7 +50,7 @@ class pkmn(object):
         self.LOCK = False
         #self.initialize() #initialize random id and derived name
 
-    def initialize(self,gen=0):
+    def initialize(self,gen=-1):
         #gen selector
         if gen >= 1 and gen <= 6:
             self.min = self.GEN_DICT[gen][0]
