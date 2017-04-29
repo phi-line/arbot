@@ -65,10 +65,15 @@ p = pkmn()
 TIME = 15
 
 @pibot.command(pass_context=True)
-async def wtp(ctx):
+async def wtp(ctx, *args):
     if not p.LOCK:
-        p.initialize()
-        print('Whos that Pokemon! ({})'.format(p.pkmn_name))
+        #print(args)
+        gen = -1
+        if args and len(args) is 1 and args[0].isdigit():
+            gen = int(args[0])
+
+        p.initialize(gen=gen)
+        print("Who's that Pokemon! ({})".format(p.pkmn_name))
         # display welcome message
         intro_msg = await pibot.say(p.display_message())
 
@@ -101,16 +106,10 @@ async def wtp(ctx):
             end_msg = 'You lose!'
 
         await pibot.delete_messages((intro_msg, kuro_img, timer_msg))
-        win_msg = await pibot.say('{} Its {}!!'.format(end_msg, p.pkmn_name))
+        win_msg = await pibot.say("{} It's #{} {}!".format(end_msg,
+                                                           p.pkmn_id,
+                                                           p.pkmn_name.capitalize()))
         color_img = await pibot.upload(p.display_img(silhouette=False))
-
-        # wait = await pibot.wait_for_message(timeout=5)
-        # if wait is None or '!wtp':
-        #     await pibot.delete_messages((win_msg, color_img))
-        #     p.LOCK = False
-        #     return
-        #
-        # await pibot.delete_messages((win_msg, color_img))
 
         p.LOCK = False
 
