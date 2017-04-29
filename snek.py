@@ -12,13 +12,12 @@ from pokemon import pkmn
 
 client = discord.Client()
 pibot = Bot(command_prefix="!")
-
-
 # pibot = commands.Bot(command_prefix='!')
+bot_name = 'snek-bot'
 
 @pibot.async_event
 async def on_ready():
-    print("Logged in as snek-bot")
+    print("Logged in as {}".format(bot_name))
 
 @pibot.command(pass_context=True)
 async def ls(ctx, *, args):
@@ -86,16 +85,19 @@ async def wtp(ctx, *args):
             p.LOCK = False
             return
 
+        def check(msg):
+            return msg.author != (bot_name)
+
         def check_guess(guess):
             guess_str = guess.content.lower()
-            # print (guess_str, p.pkmn_name)
             if guess_str == p.pkmn_name:
                 return True
             else:
                 return False
 
         timer_msg = await pibot.say('You have {} seconds to guess'.format(TIME))
-        guess = await pibot.wait_for_message(timeout=TIME, author=ctx.message.author)
+        guess = await pibot.wait_for_message(timeout=TIME, check=check)
+        await pibot.delete_messages((intro_msg, kuro_img, timer_msg))
 
         end_msg = ''
         if guess is None:
@@ -105,11 +107,11 @@ async def wtp(ctx, *args):
         else:
             end_msg = 'You lose!'
 
-        await pibot.delete_messages((intro_msg, kuro_img, timer_msg))
         win_msg = await pibot.say("{} It's #{} {}!".format(end_msg,
                                                            p.pkmn_id,
                                                            p.pkmn_name.capitalize()))
-        color_img = await pibot.upload(p.display_img(silhouette=False))
+        color_img = await pibot.upload(p.display_img(silhouette=False), delete_after=TIME)
+        #color_img = await pibot.upload(p.display_img(silhouette=False))
 
         p.LOCK = False
 
