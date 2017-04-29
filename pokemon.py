@@ -1,6 +1,6 @@
 '''
 Okay this class allows you to call !wtp from chat
-A random pokemon will appear as a silloutted bitmap and then users
+A random pokemon will appear as a silhouetted bitmap and then users
 will get some time to guess the pkmn before the time is up.
 
 Upon a correct guess or when the time runs out, the correct pokemon 
@@ -20,17 +20,14 @@ from PIL import Image
 
 import zlib
 
-MESSAGE = "You are now playing Who's That Pokemon" \
-          "\n Guess the pokemon in the shadow to win."
-
 class pkmn(object):
     '''This class contains the pokemon to be guessed.
         It also contains functions to output a sillouetted image
         of a given pokemon (filename)
     '''
     papi = PokeAPI()  # ayeee papiii
-
-    LOCK = False
+    GEN_DICT = {1:(1, 151), 2:(152, 251), 3:(252, 386),
+                4:(387, 493), 5:(494 ,649), 6:(650, 721)}
 
     DEX = "sugimori"
     COMPRESS='compress_cache'
@@ -40,6 +37,9 @@ class pkmn(object):
     TIME_TO_GUESS = 30
     MAX_PKMN = 721
 
+    MESSAGE = "You are now playing Who's That Pokemon" \
+              "\n Guess the pokemon in the shadow to win."
+
     def __init__(self):
         super(pkmn, self).__init__()
 
@@ -47,10 +47,19 @@ class pkmn(object):
         self.pkmn_id = 0
         self.pkmn_name = ''
 
-        self.initialize() #initialize random id and derived name
+        self.LOCK = False
+        #self.initialize() #initialize random id and derived name
 
-    def initialize(self):
-        id = pkmn.generate_id()
+    def initialize(self,gen=0):
+        #gen selector
+        if gen >= 1 and gen <= 6:
+            self.min = self.GEN_DICT[gen][0]
+            self.max = self.GEN_DICT[gen][1]
+        else:
+            self.min = 1
+            self.max = self.MAX_PKMN
+
+        id = self.generate_id()
         data = self.papi.get_pokemon(id)
         name = data['name']
 
@@ -58,20 +67,14 @@ class pkmn(object):
         self.pkmn_id = id
         self.pkmn_name = name
 
-        LOCK = True #sets lock as long as game is still being played
+
+        self.LOCK = True #sets lock as long as game is still being played
         return
 
     def display_message(self):
-        return MESSAGE
+        return self.MESSAGE
 
     def display_img(self, silhouette = False, compress = False):
-        # #if sihouette edit the image to mask the pokemon in question
-        # if silhouette:
-        #     return self.generate_silhouette(self.get_img_path(self.pkmn_id))
-        #
-        # #from folder return the appropriate image path to the pokemon
-        # return self.get_img_path(self.pkmn_id)
-
         img = self.get_img_path(self.pkmn_id)
         # if compress:
         #     img = self.compress_image(img)
@@ -79,31 +82,20 @@ class pkmn(object):
             img = self.generate_silhouette(img)
         return img
 
-
-    def check_guess(self, guess):
-        if guess == self.pkmn_name:
-            return True
-        else: return False
+    def generate_id(self):
+        return randint(self.min, self.max)
 
     @staticmethod
     def get_img_path(id, folder=DEX):
         path = join(dirname(abspath(__file__)), folder)
-        files = []
-        #files = [f for f in listdir(path) if ''.join(str(id), splitext(f)) in f]
+        files = ['_']
         try:
             files = [f for f in listdir(path) if ''.join((str(id),splitext(f)[1])) == f]
-            #files = [f for f in listdir(path) if str(id) in f]
         except FileNotFoundError:
             print("Could not find {} in {}".format(id, path))
-        except TypeError:
-            print("Type error {} in {}".format(id, path))
         finally:
             files.sort(key=len)
             return join(path, files[0])
-
-    @staticmethod
-    def generate_id():
-        return randint(1, pkmn.MAX_PKMN)
 
     @staticmethod
     def generate_silhouette(image_path, folder=KURO):
