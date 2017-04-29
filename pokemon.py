@@ -90,7 +90,7 @@ class pkmn(object):
         path = join(dirname(abspath(__file__)), folder)
         files = []
         #files = [f for f in listdir(path) if ''.join(str(id), splitext(f)) in f]
-        try:!wtp
+        try:
             files = [f for f in listdir(path) if ''.join((str(id),splitext(f)[1])) == f]
             #files = [f for f in listdir(path) if str(id) in f]
         except FileNotFoundError:
