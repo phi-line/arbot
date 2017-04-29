@@ -10,7 +10,7 @@ import secrets
 
 from pokemon import pkmn
 
-# pibot = discord.Client(c)
+client = discord.Client()
 pibot = Bot(command_prefix="!")
 
 
@@ -19,7 +19,6 @@ pibot = Bot(command_prefix="!")
 @pibot.async_event
 async def on_ready():
     print("Logged in as snek-bot")
-
 
 @pibot.command(pass_context=True)
 async def ls(ctx, *, args):
@@ -62,18 +61,25 @@ async def ls(ctx, *, args):
         return await pibot.send_message(ctx.message.author,
                                         "Invalid help topic. Try using !ls help.")
 
+p = pkmn()
+TIME = 15
 
 @pibot.command(pass_context=True)
 async def wtp(ctx):
-    print('Whos that Pokemon!')
-    if not pkmn.LOCK:
-        p = pkmn()
+    if not p.LOCK:
+        p.initialize()
+        print('Whos that Pokemon! ({})'.format(p.pkmn_name))
         # display welcome message
         await pibot.say(p.display_message())
 
-        # upload file
-        await pibot.upload(p.display_img(silhouette=True))
-        # await pibot.send_file(ctx.message ,p.display_img())
+        # upload silhouette
+        #await pibot.upload(p.display_img(silhouette=True), delete_after=TIME)
+        try:
+            img = await pibot.send_file(ctx.message.channel, p.display_img(silhouette=False))
+        except IsADirectoryError:
+            print('Tried to display a directory')
+
+        pkmn.LOCK = False
     return
 
 
