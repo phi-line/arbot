@@ -1,4 +1,4 @@
-import os
+import os, re
 from os.path import isfile, join, dirname, abspath
 from datetime import datetime
 from urllib.parse import urlencode
@@ -66,14 +66,12 @@ TIME = 15
 @pibot.command(pass_context=True)
 async def wtp(ctx, *args):
     if not p.LOCK:
-        #print(args)
         gen = -1
         if args and len(args) is 1 and args[0].isdigit():
             gen = int(args[0])
-
         p.initialize(gen=gen)
+
         print("Who's that Pokemon! ({})".format(p.pkmn_name))
-        # display welcome message
         intro_msg = await pibot.say(p.display_message())
 
         # upload silhouette
@@ -86,14 +84,12 @@ async def wtp(ctx, *args):
             return
 
         def check(msg):
-            return msg.author != (bot_name)
+            return msg.author != (bot_name) and \
+                   re.match(r'^\S+$', msg.content)
 
         def check_guess(guess):
             guess_str = guess.content.lower()
-            if guess_str == p.pkmn_name:
-                return True
-            else:
-                return False
+            return guess_str == p.pkmn_name
 
         timer_msg = await pibot.say('You have {} seconds to guess'.format(TIME))
         guess = await pibot.wait_for_message(timeout=TIME, check=check)

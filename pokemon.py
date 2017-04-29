@@ -12,7 +12,6 @@ only include gen one
 '''
 from os import listdir
 from os.path import isfile, join, dirname, abspath, basename, splitext
-import re
 from random import randint
 
 from PokeAPI import PokeAPI
