@@ -49,7 +49,7 @@ class pkmn(object):
         self.LOCK = False
         #self.initialize() #initialize random id and derived name
 
-    def initialize(self,gen=-1):
+    def initialize(self,gen=0,id=0):
         #gen selector
         if gen >= 1 and gen <= 6:
             self.min = self.GEN_DICT[gen][0]
@@ -58,7 +58,11 @@ class pkmn(object):
             self.min = 1
             self.max = self.MAX_PKMN
 
-        id = self.generate_id()
+        if not id:
+            id = self.generate_id()
+        elif id < 1 or id > self.MAX_PKMN:
+            id = 1
+
         data = self.papi.get_pokemon(id)
         name = data['name']
 
@@ -69,6 +73,7 @@ class pkmn(object):
 
         self.LOCK = True #sets lock as long as game is still being played
         return
+
 
     def display_message(self):
         return self.MESSAGE
