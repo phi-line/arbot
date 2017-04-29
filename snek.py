@@ -70,16 +70,51 @@ async def wtp(ctx):
         p.initialize()
         print('Whos that Pokemon! ({})'.format(p.pkmn_name))
         # display welcome message
-        await pibot.say(p.display_message())
+        intro_msg = await pibot.say(p.display_message())
 
         # upload silhouette
-        #await pibot.upload(p.display_img(silhouette=True), delete_after=TIME)
         try:
-            img = await pibot.send_file(ctx.message.channel, p.display_img(silhouette=False))
+            kuro_img = await pibot.upload(p.display_img(silhouette=True))
+            # img = await pibot.send_file(ctx.message.channel, p.display_img(silhouette=True))
         except IsADirectoryError:
             print('Tried to display a directory')
+            p.LOCK = False
+            return
 
-        pkmn.LOCK = False
+        def check_guess(guess):
+            guess_str = guess.content.lower()
+            # print (guess_str, p.pkmn_name)
+            if guess_str == p.pkmn_name:
+                return True
+            else:
+                return False
+
+        timer_msg = await pibot.say('You have {} seconds to guess'.format(TIME))
+        guess = await pibot.wait_for_message(timeout=TIME, author=ctx.message.author)
+
+        end_msg = ''
+        if guess is None:
+            end_msg = 'Time out!'
+        elif check_guess(guess):
+            end_msg = 'You win!'
+        else:
+            end_msg = 'You lose!'
+
+        await pibot.delete_messages((intro_msg, kuro_img, timer_msg))
+        win_msg = await pibot.say('{} Its {}!!'.format(end_msg, p.pkmn_name))
+        color_img = await pibot.upload(p.display_img(silhouette=False))
+
+        # wait = await pibot.wait_for_message(timeout=5)
+        # if wait is None or '!wtp':
+        #     await pibot.delete_messages((win_msg, color_img))
+        #     p.LOCK = False
+        #     return
+        #
+        # await pibot.delete_messages((win_msg, color_img))
+
+        p.LOCK = False
+
+    else: print("A game is currently in session")
     return
 
 
