@@ -85,7 +85,8 @@ async def wtp(ctx, *args):
 
         def check(msg):
             return msg.author != (bot_name) and \
-                   re.match(r'^\S+$', msg.content)
+                   re.match(r'^\S+$', msg.content) and \
+                   msg.content != '!wtp'
 
         def check_guess(guess):
             guess_str = guess.content.lower()
