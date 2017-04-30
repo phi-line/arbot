@@ -79,10 +79,10 @@ async def ls(ctx, *, args):
 
 
 TIME = 15
+p = pkmn()
 
 @pybot.command(pass_context=True)
 async def wtp(ctx, *args):
-    p = pkmn()
     if not p.LOCK:
         gen = 0
         if args and len(args) is 1 and args[0].isdigit():
@@ -139,17 +139,17 @@ IMG_URL = 'https://veekun.com/dex/media/pokemon/main-sprites/x-y/'
 @pybot.command(pass_context=True)
 async def dex(ctx, *args):
     pkmn_id = 0; pkmn_name = ''; pkmn_genus = ''; pkmn_desc = ''
-    p = pokemon.pkmn()
-    if not p.LOCK:
+    d = pokemon.pkmn()
+    if not d.LOCK:
         #pokemon number given
         if args and len(args) == 1:
             t = args[0]
             if type(t) == int or type(t) == str:
-                p.LOCK = True
+                d.LOCK = True
                 if type(t) == str:
                     t = t.lower()
 
-                pkmn = p.papi.get_pokemon_species(t)
+                pkmn = d.papi.get_pokemon_species(t)
                 pkmn_id = pkmn['id']
                 pkmn_name = pkmn['name']
                 pkmn_genus = pkmn['genera'][0]['genus'] #lang: en
@@ -159,7 +159,7 @@ async def dex(ctx, *args):
 
                 # https://veekun.com/dex/pokemon/bulbasaur
 
-                p.initialize(id=pkmn_id)
+                d.initialize(id=pkmn_id)
 
                 title = "[#{0}] {1} - the {2} Pokemon:".format(pkmn_id,
                                                                pkmn_name.capitalize(),
@@ -176,7 +176,7 @@ async def dex(ctx, *args):
 
                 msg =  await pybot.say(embed=embed)
 
-                p.LOCK = False
+                d.LOCK = False
     else:
         print("The dex is currently in use")
     return
