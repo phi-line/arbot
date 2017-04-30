@@ -1,3 +1,7 @@
+'''
+Todo: - super effective weakness chart
+      - image compression for large art
+'''
 import os, re
 from os.path import isfile, join, dirname, abspath
 from datetime import datetime
@@ -13,14 +17,15 @@ pybot = Bot(command_prefix="!")
 # pybot = commands.Bot(command_prefix='!')
 bot_name = 'arbot'
 
+import pokemon
 from pokemon import pkmn
-import flickrapi
-
-api_key = u'989932649fe52a7cb564acde5f047022'
-api_secret = u'cf37ae39f0590480'
-
-flickr = flickrapi.FlickrAPI(api_key, api_secret)
-flickr.authenticate_via_browser(perms='delete')
+# import flickrapi
+#
+# api_key = u'989932649fe52a7cb564acde5f047022'
+# api_secret = u'cf37ae39f0590480'
+#
+# flickr = flickrapi.FlickrAPI(api_key, api_secret)
+# flickr.authenticate_via_browser(perms='delete')
 
 @pybot.async_event
 async def on_ready():
@@ -64,7 +69,7 @@ async def ls(ctx, *, args):
                                         "This command is used to play the Who's that Pokemon game. Players will "
                                         "race to guess Pokemon sillouettes."
                                         "\n\n<syntax> !wtp (gen #)")
-    elif arge == "dex":
+    elif args == "dex":
         return await pybot.send_message(ctx.message.author,
                                         "This command is used to give dex info about the Pokemon"
                                         "\n\n<syntax> !dex [pknn #] / [pkmn name]")
@@ -72,11 +77,12 @@ async def ls(ctx, *, args):
         return await pybot.send_message(ctx.message.author,
                                         "Invalid help topic. Try using !ls help.")
 
-p = pkmn()
+
 TIME = 15
 
 @pybot.command(pass_context=True)
 async def wtp(ctx, *args):
+    p = pkmn()
     if not p.LOCK:
         gen = 0
         if args and len(args) is 1 and args[0].isdigit():
@@ -127,30 +133,47 @@ async def wtp(ctx, *args):
     else: print("A game is currently in session")
     return
 
-@pybot.command()
-async def dex(*args):
+COLOR = 0xe74c3c
+IMG_URL = 'https://veekun.com/dex/media/pokemon/main-sprites/x-y/'
+
+@pybot.command(pass_context=True)
+async def dex(ctx, *args):
     pkmn_id = 0; pkmn_name = ''; pkmn_genus = ''; pkmn_desc = ''
+    p = pokemon.pkmn()
     if not p.LOCK:
         #pokemon number given
         if args and len(args) == 1:
             t = args[0]
             if type(t) == int or type(t) == str:
                 p.LOCK = True
+                if type(t) == str:
+                    t = t.lower()
 
                 pkmn = p.papi.get_pokemon_species(t)
                 pkmn_id = pkmn['id']
-                pkmn_name = pkmn['name'].capitalize()
+                pkmn_name = pkmn['name']
                 pkmn_genus = pkmn['genera'][0]['genus'] #lang: en
+                pkmn_url = 'https://veekun.com/dex/pokemon/' + pkmn_name
+
                 pkmn_desc = pkmn['flavor_text_entries'][1]['flavor_text']
+
+                # https://veekun.com/dex/pokemon/bulbasaur
 
                 p.initialize(id=pkmn_id)
 
-                title = "[#{0}] {1} - the {2} Pokemon:".format(pkmn_id, pkmn_name,
-                                                                       pkmn_genus)
-                color_img = await pybot.upload(p.display_img())
+                title = "[#{0}] {1} - the {2} Pokemon:".format(pkmn_id,
+                                                               pkmn_name.capitalize(),
+                                                               pkmn_genus)
 
-                embed = discord.Embed(title=title, description=pkmn_desc, color=0xe74c3c,)
-                #embed.set_footer()
+                #color_img = await pybot.upload(p.display_img())
+
+                filename = ''.join((IMG_URL, str(pkmn_id), '.png'))
+                embed = discord.Embed(title=title,
+                                       description=pkmn_desc,
+                                       url=pkmn_url ,
+                                       color=COLOR,)
+                embed.set_thumbnail(url=filename)
+
                 msg =  await pybot.say(embed=embed)
 
                 p.LOCK = False
