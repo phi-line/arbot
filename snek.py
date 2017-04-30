@@ -8,12 +8,19 @@ from discord.ext import commands
 from discord.ext.commands import Bot
 import secrets
 
-from pokemon import pkmn
-
 client = discord.Client()
 pybot = Bot(command_prefix="!")
 # pybot = commands.Bot(command_prefix='!')
-bot_name = 'abra-bot'
+bot_name = 'arbot'
+
+from pokemon import pkmn
+import flickrapi
+
+api_key = u'989932649fe52a7cb564acde5f047022'
+api_secret = u'cf37ae39f0590480'
+
+flickr = flickrapi.FlickrAPI(api_key, api_secret)
+flickr.authenticate_via_browser(perms='delete')
 
 @pybot.async_event
 async def on_ready():
