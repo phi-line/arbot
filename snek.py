@@ -4,11 +4,14 @@ Todo: - super effective weakness chart
 '''
 import os, re
 from os.path import isfile, join, dirname, abspath
+from random import randrange
 from datetime import datetime
+
+import urllib.error
 from urllib.parse import urlencode
+from urllib.request import urlopen
 
 import discord
-from discord.ext import commands
 from discord.ext.commands import Bot
 import secrets
 
@@ -32,57 +35,17 @@ async def on_ready():
     print("Logged in as {}".format(bot_name))
     await pybot.edit_profile(username=bot_name)
 
-@pybot.command(pass_context=True)
-async def ls(ctx, *, args):
-    print(args)
-    print(len(args))
-    if args == "help":
-        return await pybot.send_message(ctx.message.author,
-                                        "Command list: !tw !yt !dd !py !dpy !ti !pyg"
-                                        "\n\nType !ls \"command\" for help on that topic.")
-    elif args == "tw":
-        return await pybot.send_message(ctx.message.author,
-                                        "This command is used to link a twitch user's stream."
-                                        "\n\n<syntax> !tw \"username\"")
-    elif args == "yt":
-        return await pybot.send_message(ctx.message.author,
-                                        "This command is used to link youtube searches."
-                                        "\n\n<syntax> !yt \"term1\" \"term2\" \"term3\"")
-    elif args == "dd":
-        return await pybot.send_message(ctx.message.author,
-                                        "This command is used to link Duck Duck Go searches."
-                                        "\n\n<syntax> !dd \"term1\" \"term2\" \"term3\"")
-    elif args == "py":
-        return await pybot.send_message(ctx.message.author,
-                                        "This command is used to link Python documentation searches."
-                                        "\n\n<syntax> !py \"term1\" \"term2\" \"term3\"")
-    elif args == "dpy":
-        return await pybot.send_message(ctx.message.author,
-                                        "This command is used to link discord.py documentation searches."
-                                        "\n\n<syntax> !dpy \"term1\" \"term2\" \"term3\"")
-    elif args == "ti":
-        return await pybot.send_message(ctx.message.author,
-                                        "This command is used to post the local time of the bot (usually pacific)."
-                                        "\n\n<syntax> !ti")
-    elif args == "wtp":
-        return await pybot.send_message(ctx.message.author,
-                                        "This command is used to play the Who's that Pokemon game. Players will "
-                                        "race to guess Pokemon sillouettes."
-                                        "\n\n<syntax> !wtp (gen #)")
-    elif args == "dex":
-        return await pybot.send_message(ctx.message.author,
-                                        "This command is used to give dex info about the Pokemon"
-                                        "\n\n<syntax> !dex [pknn #] / [pkmn name]")
-    else:
-        return await pybot.send_message(ctx.message.author,
-                                        "Invalid help topic. Try using !ls help.")
-
-
 TIME = 15
 p = pkmn()
 
 @pybot.command(pass_context=True)
 async def wtp(ctx, *args):
+    '''
+    Play 'Who's that Pokemon' game
+    Players will race to guess Pokemon sillouettes
+    Usage: !wtp (gen #)
+    e.g:   !wtp / !wtp 1
+    '''
     if not p.LOCK:
         gen = 0
         if args and len(args) is 1 and args[0].isdigit():
@@ -135,31 +98,60 @@ async def wtp(ctx, *args):
 
 COLOR = 0xe74c3c
 IMG_URL = 'https://veekun.com/dex/media/pokemon/main-sprites/x-y/'
+GIF_URL = 'http://www.pkparaiso.com/imagenes/xy/sprites/animados/'
+DEX_URL = 'http://cdn.bulbagarden.net/upload/9/98/Key_Rotom_Pok%C3%A9dex_Sprite.png'
 
 @pybot.command(pass_context=True)
 async def dex(ctx, *args):
-    pkmn_id = 0; pkmn_name = ''; pkmn_genus = ''; pkmn_desc = ''
-    d = pokemon.pkmn()
-    if not d.LOCK:
+    '''
+    PokeDex entry for any PKMN
+    Usage: !dex [pkmn # or name]
+    e.g:   !dex 151 / !dex mew
+    '''
+    pkmn_id = 0; pkmn_name = ''; pkmn_genus = ''; pkmn_url = ''; pkmn_desc = ''
+    dx = pokemon.pkmn()
+    if not dx.LOCK:
         #pokemon number given
         if args and len(args) == 1:
             t = args[0]
             if type(t) == int or type(t) == str:
-                d.LOCK = True
+                dx.LOCK = True
                 if type(t) == str:
                     t = t.lower()
 
-                pkmn = d.papi.get_pokemon_species(t)
+                try:
+                    pkmn = dx.papi.get_pokemon_species(t)
+                except ValueError:
+                    console_txt = 'Invalid Pokemon: ' + str(t) + ' given'
+                    print(console_txt)
+
+                    title = 'What the zzzt?! invalid Pokemon name / ID'
+                    desc = "Pokemon must be from Gen I - VI\n"\
+                           "```Usage: !dex [pkmn # or name]\n"\
+                           "e.g:   !dex 151 / !dex mew```"
+
+                    embed = discord.Embed(title=title, description=desc, color=COLOR)
+                    embed.set_thumbnail(url=DEX_URL)
+                    msg = await pybot.say(embed=embed)
+
+                    dx.LOCK = False
+                    return
+
                 pkmn_id = pkmn['id']
                 pkmn_name = pkmn['name']
                 pkmn_genus = pkmn['genera'][0]['genus'] #lang: en
                 pkmn_url = 'https://veekun.com/dex/pokemon/' + pkmn_name
 
                 pkmn_desc = pkmn['flavor_text_entries'][1]['flavor_text']
+                # pkmn_desc_list= pkmn['flavor_text_entries']
+                # pkmn_desc_en = [i for i in [j for j in range(len(pkmn_desc_list))]\
+                #                if pkmn_desc_list[i]['language']['name'] == 'en']
+                # en_i = pkmn_desc_en[randrange(0, len(pkmn_desc_en))]
+                # pkmn_desc = pkmn['flavor_text_entries'][en_i]['flavor_text']
 
                 # https://veekun.com/dex/pokemon/bulbasaur
 
-                d.initialize(id=pkmn_id)
+                dx.initialize(id=pkmn_id)
 
                 title = "[#{0}] {1} - the {2} Pokemon:".format(pkmn_id,
                                                                pkmn_name.capitalize(),
@@ -167,7 +159,12 @@ async def dex(ctx, *args):
 
                 #color_img = await pybot.upload(p.display_img())
 
-                filename = ''.join((IMG_URL, str(pkmn_id), '.png'))
+                try:
+                    filename = ''.join((GIF_URL, str(pkmn_name), '.gif'))
+                    a = urlopen(filename)
+                except urllib.error.HTTPError:
+                    filename = ''.join((IMG_URL, str(pkmn_id), '.png'))
+
                 embed = discord.Embed(title=title,
                                        description=pkmn_desc,
                                        url=pkmn_url ,
@@ -176,15 +173,18 @@ async def dex(ctx, *args):
 
                 msg =  await pybot.say(embed=embed)
 
-                d.LOCK = False
+                dx.LOCK = False
     else:
         print("The dex is currently in use")
     return
 
-
-
 @pybot.command()
 async def tw(*args):
+    '''
+    Twitch username lookup
+    Usage: !tw [username]
+    e.g:   !tw phi_liney
+    '''
     print(args)
     url = ("https://www.twitch.tv/{}".format(args[0]))
     return await pybot.say(url)
@@ -192,6 +192,11 @@ async def tw(*args):
 
 @pybot.command()
 async def yt(*args):
+    '''
+    YouTube search
+    Usage: !yt [query]
+    e.g:   !yt cat videos
+    '''
     print(args)
     url = ("https://www.youtube.com/results?search_{}".format(
         urlencode({'query': ' '.join(args)})))
@@ -199,7 +204,12 @@ async def yt(*args):
 
 
 @pybot.command()
-async def dd(*args):
+async def ddg(*args):
+    '''
+    DuckDuckGo search
+    Usage: !ddg [query]
+    e.g:   !ddg cat pictures
+    '''
     print(args)
     url = ("https://duckduckgo.com/?{}".format(
         urlencode({'q': ' '.join(args)})))
@@ -208,6 +218,11 @@ async def dd(*args):
 
 @pybot.command()
 async def py(*args):
+    '''
+    Python 3 documentation search
+    Usage: !py [query]
+    e.g:   !py dictionary
+    '''
     print(args)
     url = ("https://docs.python.org/3/search.html?{}"
            "&check_keywords=yes&area=default".format(
@@ -217,6 +232,11 @@ async def py(*args):
 
 @pybot.command()
 async def dpy(*args):
+    '''
+    Discord.py documentation search
+    Usage: !dpy [query]
+    e.g:   !dpy embed
+    '''
     print(args)
     url = ("https://discordpy.readthedocs.io/en/latest/search.html?{}"
            "&check_keywords=yes&area=default".format(
@@ -225,7 +245,11 @@ async def dpy(*args):
 
 
 @pybot.command()
-async def ti(*args):
+async def ti():
+    '''
+    Display the bot's time (PST)
+    Usage: !ti
+    '''
     now = datetime.now()
     print(now)
     return await pybot.say("piB0t time is %s:%s:%s PST  %s/%s/%s"
