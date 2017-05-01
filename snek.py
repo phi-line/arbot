@@ -22,13 +22,6 @@ bot_name = 'arbot'
 
 import pokemon
 from pokemon import pkmn
-# import flickrapi
-#
-# api_key = u'989932649fe52a7cb564acde5f047022'
-# api_secret = u'cf37ae39f0590480'
-#
-# flickr = flickrapi.FlickrAPI(api_key, api_secret)
-# flickr.authenticate_via_browser(perms='delete')
 
 @pybot.async_event
 async def on_ready():
@@ -89,7 +82,6 @@ async def wtp(ctx, *args):
                                                            p.pkmn_id,
                                                            p.pkmn_name.capitalize()))
         color_img = await pybot.upload(p.display_img(silhouette=False), delete_after=TIME)
-        #color_img = await pybot.upload(p.display_img(silhouette=False))
 
         p.LOCK = False
 
@@ -99,7 +91,7 @@ async def wtp(ctx, *args):
 COLOR = 0xe74c3c
 IMG_URL = 'https://veekun.com/dex/media/pokemon/main-sprites/x-y/'
 GIF_URL = 'http://www.pkparaiso.com/imagenes/xy/sprites/animados/'
-DEX_URL = 'http://cdn.bulbagarden.net/upload/9/98/Key_Rotom_Pok%C3%A9dex_Sprite.png'
+DEX_URL = 'http://cdn.bulbagarden.net/upload/thumb/3/36/479Rotom-Pok%C3%A9dex.png/160px-479Rotom-Pok%C3%A9dex.png'
 
 @pybot.command(pass_context=True)
 async def dex(ctx, *args):
@@ -125,14 +117,8 @@ async def dex(ctx, *args):
                     console_txt = 'Invalid Pokemon: ' + str(t) + ' given'
                     print(console_txt)
 
-                    title = 'What the zzzt?! invalid Pokemon name / ID'
-                    desc = "Pokemon must be from Gen I - VI\n"\
-                           "```Usage: !dex [pkmn # or name]\n"\
-                           "e.g:   !dex 151 / !dex mew```"
-
-                    embed = discord.Embed(title=title, description=desc, color=COLOR)
-                    embed.set_thumbnail(url=DEX_URL)
-                    msg = await pybot.say(embed=embed)
+                    title = 'What the zzzt?! Invalid Pokemon name / ID'
+                    msg = await pybot.say(embed=rotom_embed(title))
 
                     dx.LOCK = False
                     return
@@ -149,15 +135,7 @@ async def dex(ctx, *args):
                 # en_i = pkmn_desc_en[randrange(0, len(pkmn_desc_en))]
                 # pkmn_desc = pkmn['flavor_text_entries'][en_i]['flavor_text']
 
-                # https://veekun.com/dex/pokemon/bulbasaur
-
                 dx.initialize(id=pkmn_id)
-
-                title = "[#{0}] {1} - the {2} Pokemon:".format(pkmn_id,
-                                                               pkmn_name.capitalize(),
-                                                               pkmn_genus)
-
-                #color_img = await pybot.upload(p.display_img())
 
                 try:
                     filename = ''.join((GIF_URL, str(pkmn_name), '.gif'))
@@ -165,18 +143,32 @@ async def dex(ctx, *args):
                 except urllib.error.HTTPError:
                     filename = ''.join((IMG_URL, str(pkmn_id), '.png'))
 
-                embed = discord.Embed(title=title,
-                                       description=pkmn_desc,
-                                       url=pkmn_url ,
-                                       color=COLOR,)
+                title = "[#{0}] {1} - the {2} Pokemon:".format(pkmn_id,
+                                                               pkmn_name.capitalize(),
+                                                               pkmn_genus)
+                embed = discord.Embed(title=title, description=pkmn_desc,
+                                      url=pkmn_url, color=COLOR)
                 embed.set_thumbnail(url=filename)
-
-                msg =  await pybot.say(embed=embed)
+                msg = await pybot.say(embed=embed)
 
                 dx.LOCK = False
+                return
+        else:
+            title = 'Kzzzzrrt?! Invalid usage! Zzt-zzt!'
+            msg = await pybot.say(embed=rotom_embed(title))
+            return
     else:
         print("The dex is currently in use")
     return
+
+def rotom_embed(title=''):
+    desc = "Pokemon must be from Gen I - VI\n" \
+           "```Usage: !dex [pkmn # or name]\n" \
+           "e.g:   !dex 151 / !dex mew```"
+
+    embed = discord.Embed(title=title, description=desc, color=COLOR)
+    embed.set_thumbnail(url=DEX_URL)
+    return embed
 
 @pybot.command()
 async def tw(*args):
