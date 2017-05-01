@@ -29,7 +29,7 @@ from pokemon import pkmn
 @pybot.async_event
 async def on_ready():
     print("Logged in as {}".format(bot_name))
-    await pybot.edit_profile(username=bot_name, avatar=open(avatar, 'rb').read())
+    #await pybot.edit_profile(username=bot_name, avatar=open(avatar, 'rb').read())
 
 TIME = 15
 p = pkmn()
@@ -174,6 +174,13 @@ FUSE_USAGE = "Pokémon must be from Gen I only\n" \
 
 @pybot.command()
 async def fuse(p1=None, p2=None):
+    '''
+    Fuse two Gen I Pokémon together!
+    Credits: Alex Onsager - fused images
+    Usage: !fuse [pkmn # or name]
+    e.g:   !fuse abra mew / !fuse 1 25
+    '''
+
     if p1:
         if p1 == '-r':
             p1 = randint(1,151)
@@ -193,14 +200,31 @@ async def fuse(p1=None, p2=None):
             msg = await pybot.say(embed=rotom_embed(title,FUSE_USAGE))
             return
 
-        title = "Zzz-zzzzt! Fused {0} and {1}!".format(pkmn_1['name'].capitalize(),
-                                                       pkmn_2['name'].capitalize())
-        url = FUSE_URL.format(pkmn_1['id'], pkmn_2['id'])
+        pk1_name = pkmn_1['name']; pk2_name = pkmn_2['name']
+        title = "Zzz-zzzzt! Fused {0} and {1}!".format(pk1_name.capitalize(),
+                                                       pk2_name.capitalize())
+        print(title)
+
+        lp1 = len(pk1_name); lp2 = len(pk2_name)
+        ratio = (lp1 / lp2)/2
+        # print(ratio)
+        fuse_name = pk1_name[:int(ratio*lp1)] + pk2_name[int(ratio*lp2):]
+        fuse_name = fuse_name.capitalize()
+        pk1_genus = papi.get_pokemon_species(p1)['genera'][0]['genus']
+        pk2_genus = papi.get_pokemon_species(p2)['genera'][0]['genus']
+
+        desc = "the {0} {1} Pokémon".format(pk1_genus, pk2_genus)
+
+        #url = FUSE_URL.format(pkmn_1['id'], pkmn_2['id'])
         img = FUSE_IMG.format(pkmn_1['id'], pkmn_2['id'])
 
-        embed = discord.Embed(title=title,
-                          url=img, color=COLOR)
-        embed.set_thumbnail(url=img)
+        # type_set1 = {i['type']['name'].capitalize() for i in pkmn_1['types']}
+        # type_set2 = {j['type']['name'].capitalize() for j in pkmn_2['types']}
+        # type_str = ' '.join(type_set1.union(type_set2))
+
+        embed = discord.Embed(title='', description=title, color=COLOR)
+        embed.add_field(name=fuse_name, value=desc, inline=True)
+        embed.set_image(url=img)
         msg = await pybot.say(embed=embed)
     else:
         title = 'Kzzzzrrt?! Invalid usage! Zzt-zzt!'
