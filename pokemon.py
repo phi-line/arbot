@@ -36,7 +36,7 @@ class pkmn(object):
     TIME_TO_GUESS = 30
     MAX_PKMN = 721
 
-    MESSAGE = "You are now playing Who's That Pokemon!" \
+    MESSAGE = "You are now playing Who's That Pokémon!" \
               "\n Guess the pokemon in the shadow to win."
 
     def __init__(self):

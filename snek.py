@@ -6,6 +6,7 @@ import os, re
 from os.path import isfile, join, dirname, abspath
 from random import randrange
 from datetime import datetime
+from string import punctuation
 
 import urllib.error
 from urllib.parse import urlencode
@@ -19,14 +20,16 @@ client = discord.Client()
 pybot = Bot(command_prefix="!")
 # pybot = commands.Bot(command_prefix='!')
 bot_name = 'arbot'
+avatar = 'arbok.png'
 
+from PokeAPI import PokeAPI
 import pokemon
 from pokemon import pkmn
 
 @pybot.async_event
 async def on_ready():
     print("Logged in as {}".format(bot_name))
-    await pybot.edit_profile(username=bot_name)
+    await pybot.edit_profile(username=bot_name, avatar=open(avatar, 'rb').read())
 
 TIME = 15
 p = pkmn()
@@ -45,7 +48,7 @@ async def wtp(ctx, *args):
             gen = int(args[0])
         p.initialize(gen=gen)
 
-        print("Who's that Pokemon! ({})".format(p.pkmn_name))
+        print("Who's that Pokémon! ({})".format(p.pkmn_name))
         intro_msg = await pybot.say(p.display_message())
 
         # upload silhouette
@@ -90,8 +93,13 @@ async def wtp(ctx, *args):
 
 COLOR = 0xe74c3c
 IMG_URL = 'https://veekun.com/dex/media/pokemon/main-sprites/x-y/'
-GIF_URL = 'http://www.pkparaiso.com/imagenes/xy/sprites/animados/'
+#GIF_URL = 'http://www.pkparaiso.com/imagenes/xy/sprites/animados/'
+GIF_URL = 'http://www.pokestadium.com/sprites/xy/'
 DEX_URL = 'http://cdn.bulbagarden.net/upload/thumb/3/36/479Rotom-Pok%C3%A9dex.png/160px-479Rotom-Pok%C3%A9dex.png'
+
+DEX_USAGE = "Pokémon must be from Gen I - VI\n" \
+              "```Usage: !dex [pkmn # or name]\n" \
+              "e.g:   !dex 151 / !dex mew```"
 
 @pybot.command(pass_context=True)
 async def dex(ctx, *args):
@@ -114,11 +122,11 @@ async def dex(ctx, *args):
                 try:
                     pkmn = dx.papi.get_pokemon_species(t)
                 except ValueError:
-                    console_txt = 'Invalid Pokemon: ' + str(t) + ' given'
+                    console_txt = 'Invalid Pokémon: ' + str(t) + ' given'
                     print(console_txt)
 
-                    title = 'What the zzzt?! Invalid Pokemon name / ID'
-                    msg = await pybot.say(embed=rotom_embed(title))
+                    title = 'What the zzzt?! Invalid Pokémon name / ID'
+                    msg = await pybot.say(embed=rotom_embed(title,DEX_USAGE))
 
                     dx.LOCK = False
                     return
@@ -127,18 +135,15 @@ async def dex(ctx, *args):
                 pkmn_name = pkmn['name']
                 pkmn_genus = pkmn['genera'][0]['genus'] #lang: en
                 pkmn_url = 'https://veekun.com/dex/pokemon/' + pkmn_name
-
                 pkmn_desc = pkmn['flavor_text_entries'][1]['flavor_text']
-                # pkmn_desc_list= pkmn['flavor_text_entries']
-                # pkmn_desc_en = [i for i in [j for j in range(len(pkmn_desc_list))]\
-                #                if pkmn_desc_list[i]['language']['name'] == 'en']
-                # en_i = pkmn_desc_en[randrange(0, len(pkmn_desc_en))]
-                # pkmn_desc = pkmn['flavor_text_entries'][en_i]['flavor_text']
 
                 dx.initialize(id=pkmn_id)
 
+                #print(''.join((GIF_URL, str(pkmn_name), '.gif')))
                 try:
-                    filename = ''.join((GIF_URL, str(pkmn_name), '.gif'))
+                    s = str(pkmn_name)
+                    trans = str.maketrans('', '', punctuation)
+                    filename = ''.join((GIF_URL, s.translate(trans), '.gif'))
                     a = urlopen(filename)
                 except urllib.error.HTTPError:
                     filename = ''.join((IMG_URL, str(pkmn_id), '.png'))
@@ -155,17 +160,51 @@ async def dex(ctx, *args):
                 return
         else:
             title = 'Kzzzzrrt?! Invalid usage! Zzt-zzt!'
-            msg = await pybot.say(embed=rotom_embed(title))
+            msg = await pybot.say(embed=rotom_embed(title,DEX_USAGE))
             return
     else:
         print("The dex is currently in use")
     return
 
-def rotom_embed(title=''):
-    desc = "Pokemon must be from Gen I - VI\n" \
-           "```Usage: !dex [pkmn # or name]\n" \
-           "e.g:   !dex 151 / !dex mew```"
+FUSE_URL = 'http://pokemon.alexonsager.net/{0}/{1}'
+FUSE_IMG = 'http://images.alexonsager.net/pokemon/fused/{0}/{0}.{1}.png'
+FUSE_USAGE = "Pokémon must be from Gen I only\n" \
+              "```Usage: !fuse [pkmn # or name]\n" \
+              "e.g:   !fuse abra mew```"
 
+@pybot.command()
+async def fuse(*args):
+    papi = PokeAPI()
+    if args and len(args) == 2:
+        p1 = args[0]; p2 = args[1]
+        try:
+            pkmn_1 = papi.get_pokemon(p1)
+            pkmn_2 = papi.get_pokemon(p2)
+            if pkmn_1['id'] > 151 or pkmn_2['id'] > 151:
+                raise ValueError
+        except ValueError:
+            console_txt = 'Invalid Pokémon given'
+            print(console_txt)
+
+            title = "Zzzrt?! It'zzz an unidentified Pokémon!"
+            msg = await pybot.say(embed=rotom_embed(title,FUSE_USAGE))
+            return
+
+        title = "Zzz-zzzzt! Fused {0} and {1}!".format(pkmn_1['name'].capitalize(),
+                                                       pkmn_2['name'].capitalize())
+        url = FUSE_URL.format(pkmn_1['id'], pkmn_2['id'])
+        img = FUSE_IMG.format(pkmn_1['id'], pkmn_2['id'])
+
+        embed = discord.Embed(description=title,
+                          url=url, color=COLOR)
+        embed.set_thumbnail(url=img)
+        msg = await pybot.say(embed=embed)
+    else:
+        title = 'Kzzzzrrt?! Invalid usage! Zzt-zzt!'
+        msg = await pybot.say(embed=rotom_embed(title, FUSE_USAGE))
+    return
+
+def rotom_embed(title='', desc=''):
     embed = discord.Embed(title=title, description=desc, color=COLOR)
     embed.set_thumbnail(url=DEX_URL)
     return embed
