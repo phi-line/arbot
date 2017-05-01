@@ -4,7 +4,7 @@ Todo: - super effective weakness chart
 '''
 import os, re
 from os.path import isfile, join, dirname, abspath
-from random import randrange
+from random import randrange, randint
 from datetime import datetime
 from string import punctuation
 
@@ -173,10 +173,13 @@ FUSE_USAGE = "Pokémon must be from Gen I only\n" \
               "e.g:   !fuse abra mew```"
 
 @pybot.command()
-async def fuse(*args):
-    papi = PokeAPI()
-    if args and len(args) == 2:
-        p1 = args[0]; p2 = args[1]
+async def fuse(p1=None, p2=None):
+    if p1:
+        if p1 == '-r':
+            p1 = randint(1,151)
+            p2 = randint(1,151)
+    if p1 and p2:
+        papi = PokeAPI()
         try:
             pkmn_1 = papi.get_pokemon(p1)
             pkmn_2 = papi.get_pokemon(p2)
@@ -195,8 +198,8 @@ async def fuse(*args):
         url = FUSE_URL.format(pkmn_1['id'], pkmn_2['id'])
         img = FUSE_IMG.format(pkmn_1['id'], pkmn_2['id'])
 
-        embed = discord.Embed(description=title,
-                          url=url, color=COLOR)
+        embed = discord.Embed(title=title,
+                          url=img, color=COLOR)
         embed.set_thumbnail(url=img)
         msg = await pybot.say(embed=embed)
     else:
