@@ -30,9 +30,10 @@ class Pokedex():
         from pokedex import Pokedex as this
         pkmn_id = 0; pkmn_name = ''; pkmn_genus = ''; pkmn_url = ''; pkmn_desc = '';
         random_args = ['-r', '-rand', '-random']
-        papi = PokeAPI()
+        shiny = False
+
         if not self.lock:
-            #pokemon number given
+            papi = PokeAPI()
             if args and len(args) >= 1:
                 t = args[0]
                 if type(t) == str and t.startswith('-'):
@@ -40,6 +41,8 @@ class Pokedex():
                         p = pkmn()
                         p.initialize()
                         t = p.pkmn_id
+                if '-s' in args[1:] or '-shiny' in args[1:]:
+                    shiny = True
                 if type(t) == int or type(t) == str:
                     self.lock = True
                     if type(t) == str:
@@ -67,16 +70,17 @@ class Pokedex():
                     pkmn_type = {i['type']['name'] for i in pt}
                     print("Displaying Pokemon {0} #{1}".format(pkmn_name, pkmn_id))
 
-                    if '-s' not in args[1:] and '-shiny' not in args[1:]:
-                        try:
-                            s = str(pkmn_name)
-                            trans = str.maketrans('', '', punctuation)
-                            filename = ''.join((g.GIF_URL, s.translate(trans), '.gif'))
-                            a = urlopen(filename)
-                        except HTTPError:
-                            filename = ''.join((g.IMG_URL, str(pkmn_id), '.png'))
-                    else: filename = ''.join((g.IMG_URL, 'shiny/' ,str(pkmn_id), '.png'))
+                    # if '-s' not in args[1:] and '-shiny' not in args[1:]:
+                    #     try:
+                    #         s = str(pkmn_name)
+                    #         trans = str.maketrans('', '', punctuation)
+                    #         filename = ''.join((g.GIF_URL, s.translate(trans), '.gif'))
+                    #         a = urlopen(filename)
+                    #     except HTTPError:
+                    #         filename = ''.join((g.IMG_URL, str(pkmn_id), '.png'))
+                    # else: filename = ''.join((g.IMG_URL, 'shiny/' ,str(pkmn_id), '.png'))
 
+                    filename = self.get_thumbnail(pkmn_id, pkmn_name, shiny=shiny)
                     type_emojis = '  '.join({g.TYPE_DICT[t] for t in pkmn_type if t in g.TYPE_DICT})
                     title = "{0} #{1} {2}".format(pkmn_name.capitalize(), pkmn_id, type_emojis)
                     sub_title = "the {0} Pokémon".format(pkmn_genus)
@@ -96,6 +100,23 @@ class Pokedex():
         else:
             print("The dex is currently in use")
         return
+
+    @staticmethod
+    def get_thumbnail(id, name, shiny=False):
+        filename = ''
+        try:
+            s = str(name)
+            trans = str.maketrans('', '', punctuation)
+            if not shiny:
+                filename =   ''.join((g.GIF_URL, s.translate(trans), '.gif'))
+            else: filename = ''.join((g.S_GIF_URL, s.translate(trans), '.gif'))
+            a = urlopen(filename)
+        except HTTPError:
+            if not shiny:
+                filename =   ''.join((g.IMG_URL, str(id), '.png'))
+            else: filename = ''.join((g.S_IMG_URL, str(id), '.png'))
+        finally:
+            return filename
 
     @staticmethod
     def std_embed(title='', url='', thumbnail_url='', sub_title='', value='', color=g.COLOR):

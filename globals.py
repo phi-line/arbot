@@ -3,8 +3,10 @@ class Globals():
     COLOR = 0xe74c3c #color for embed (red)
 
     IMG_URL = 'https://veekun.com/dex/media/pokemon/main-sprites/x-y/'
+    S_IMG_URL = 'https://veekun.com/dex/media/pokemon/main-sprites/x-y/shiny/'
     # GIF_URL = 'http://www.pkparaiso.com/imagenes/xy/sprites/animados/'
     GIF_URL = 'http://www.pokestadium.com/sprites/xy/'
+    S_GIF_URL = 'http://www.pokestadium.com/sprites/xy/shiny/'
     DEX_URL = 'http://cdn.bulbagarden.net/upload/thumb/3/36/479Rotom-Pok%C3%A9dex.png/160px-479Rotom-Pok%C3%A9dex.png'
 
 
