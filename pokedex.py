@@ -13,6 +13,7 @@ from exceptions import Rotom as rtm
 class Pokedex():
     def __init__(self, bot):
         self.bot = bot
+        self.lock = False
 
     DEX_USAGE = "Pokémon must be from Gen I - VI\n" \
                 "```Usage: !dex [pkmn # or name]\n" \
@@ -28,12 +29,12 @@ class Pokedex():
         from pokedex import Pokedex as this
         pkmn_id = 0; pkmn_name = ''; pkmn_genus = ''; pkmn_url = ''; pkmn_desc = '';
         dx = pkmn()
-        if not dx.LOCK:
+        if not self.lock:
             #pokemon number given
             if args and len(args) == 1:
                 t = args[0]
                 if type(t) == int or type(t) == str:
-                    dx.LOCK = True
+                    self.lock = True
                     if type(t) == str:
                         t = t.lower()
 
@@ -46,7 +47,7 @@ class Pokedex():
                         title = 'What the zzzt?! Invalid Pokémon name / ID'
                         msg = await self.bot.say(embed=rtm.rotom_embed(title,this.DEX_USAGE))
 
-                        dx.LOCK = False
+                        self.lock = False
                         return
 
                     pkmn_id = p['id']
@@ -74,11 +75,11 @@ class Pokedex():
                     embed.set_thumbnail(url=filename)
                     msg = await self.bot.say(embed=embed)
 
-                    dx.LOCK = False
+                    self.lock = False
                     return
             else:
                 title = 'Kzzzzrrt?! Invalid usage! Zzt-zzt!'
-                msg = await self.bot.say(embed=rtm.rotom_embed(title,g=this.DEX_USAGE))
+                msg = await self.bot.say(embed=rtm.rotom_embed(title,this.DEX_USAGE))
                 return
         else:
             print("The dex is currently in use")
