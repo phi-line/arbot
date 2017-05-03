@@ -1,6 +1,6 @@
 from discord.ext import commands
 import secrets
-
+import traceback
 from datetime import datetime
 
 description = '''An example arbot to showcase the discord.ext.commands extension
@@ -19,6 +19,17 @@ async def on_ready():
     print(arbot.user.name)
     print('Servers: ' + ', '.join([str(s) for s in arbot.servers]))
     print('------')
+    
+@arbot.event
+async def on_command(s,e):
+    print("{0.name} used >{1} in {2.name} (Channel #{3})".format(e.message.author,s,e.message.server,e.message.channel))
+
+@arbot.event
+async def on_command_error(error,ctx):
+    em = discord.Embed(title="An Error occured",description="Sorry but I couldn't process that command properely",color=discord.Color.red())
+    await bot.send_message(ctx.message.channel,embed=em)
+    tb = "\n".join(traceback.format_tb(error.original.__traceback__))
+    print("{}: {}\n{}".format(error.original.__class__.__name__,str(error),str(tb)))
 
 @arbot.command()
 async def load(extension_name : str):
