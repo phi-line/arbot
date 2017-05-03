@@ -90,11 +90,19 @@ class Games():
         e.g:   !fuse abra mew / !fuse 1 25
         '''
         from games import Games as this
-        if p1:
-            if p1 == '-r':
+        random_args = ['-r', '-rand', '-random']; r = False
+        if p1 and not p2:
+            if p1 in random_args:
                 p1 = randint(1,151)
                 p2 = randint(1,151)
+                r = True
         if p1 and p2:
+            if not r and (p1 in random_args or p2 in random_args):
+                if p1 in random_args:
+                    p1 = randint(1,151)
+                if p2 in random_args:
+                    p2 = randint(1,151)
+
             papi = PokeAPI()
             try:
                 pkmn_1 = papi.get_pokemon(p1)
@@ -102,7 +110,7 @@ class Games():
                 if pkmn_1['id'] > 151 or pkmn_2['id'] > 151:
                     raise ValueError
             except ValueError:
-                console_txt = 'Invalid Pokémon given'
+                console_txt = 'Invalid Pokémon given: {0} and {1}'.format(p1, p2)
                 print(console_txt)
 
                 title = "Zzzrt?! It'zzz an unidentified Pokémon!"
