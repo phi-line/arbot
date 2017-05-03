@@ -17,8 +17,12 @@ class Pokedex():
         self.lock = False
 
     DEX_USAGE = "Pokémon must be from Gen I - VI\n" \
-                "```Usage: !dex [pkmn # or name]\n" \
-                "e.g:   !dex 151 / !dex mew```"
+                "```Args :\n" \
+                "Random Pokémon -r / -random\n" \
+                "Shiny  Pokémon -s / -shiny\n\n" \
+                "Usage: !dex [p1] / '-r' ('-s')\n" \
+                "e.g:   !dex 151 / !dex mew\n" \
+                "       !dex -random -shiny```"
 
     @commands.command(pass_context=True)
     async def dex(self, ctx, *args):
@@ -70,18 +74,11 @@ class Pokedex():
                     pkmn_type = {i['type']['name'] for i in pt}
                     print("Displaying Pokemon {0} #{1}".format(pkmn_name, pkmn_id))
 
-                    # if '-s' not in args[1:] and '-shiny' not in args[1:]:
-                    #     try:
-                    #         s = str(pkmn_name)
-                    #         trans = str.maketrans('', '', punctuation)
-                    #         filename = ''.join((g.GIF_URL, s.translate(trans), '.gif'))
-                    #         a = urlopen(filename)
-                    #     except HTTPError:
-                    #         filename = ''.join((g.IMG_URL, str(pkmn_id), '.png'))
-                    # else: filename = ''.join((g.IMG_URL, 'shiny/' ,str(pkmn_id), '.png'))
-
                     filename = self.get_thumbnail(pkmn_id, pkmn_name, shiny=shiny)
+
                     type_emojis = '  '.join({g.TYPE_DICT[t] for t in pkmn_type if t in g.TYPE_DICT})
+                    if shiny: type_emojis += g.S_ICON
+
                     title = "{0} #{1} {2}".format(pkmn_name.capitalize(), pkmn_id, type_emojis)
                     sub_title = "the {0} Pokémon".format(pkmn_genus)
 
