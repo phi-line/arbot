@@ -2,9 +2,8 @@
 Todo: - super effective weakness chart
       - image compression for large art
 '''
-import os, re
-from os.path import isfile, join, dirname, abspath
-from random import randrange, randint
+import re
+from random import randint
 from datetime import datetime
 from string import punctuation
 

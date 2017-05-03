@@ -78,10 +78,8 @@ class pkmn(object):
     def display_message(self):
         return self.MESSAGE
 
-    def display_img(self, silhouette = False, compress = False):
+    def display_img(self, silhouette = False):
         img = self.get_img_path(self.pkmn_id)
-        # if compress:
-        #     img = self.compress_image(img)
         if silhouette:
             img = self.generate_silhouette(img)
         return img
@@ -126,23 +124,6 @@ class pkmn(object):
     @staticmethod
     def almost_equals(a, b, thres=50):
         return abs(a - b) < thres
-
-    @staticmethod
-    def compress_image(image_path, input=DEX, output=COMPRESS, compression_rate=9):
-        filename = basename(image_path)
-        old_path = join(dirname(abspath(__file__)), input, filename)
-        new_path = join(dirname(abspath(__file__)), output, filename)
-
-        if isfile(new_path):
-            return new_path
-
-        with open(old_path, "rb") as in_file:
-            compressed = zlib.compress(in_file.read(), compression_rate)
-
-        with open(new_path, "wb") as out_file:
-            out_file.write(compressed)
-
-        return new_path
 
 '''
 Design flow:
