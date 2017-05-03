@@ -11,7 +11,7 @@ There are a number of utility commands being showcased here.'''
 # this specifies what extensions to load when the arbot starts up
 startup_extensions = ["search", "games", "pokedex"]
 
-arbot = commands.Bot(command_prefix='>', description=description)
+arbot = commands.Bot(command_prefix='>', description=description, )
 
 @arbot.event
 async def on_ready():
