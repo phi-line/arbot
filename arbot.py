@@ -17,7 +17,7 @@ arbot = commands.Bot(command_prefix='>', description=description, )
 async def on_ready():
     print('Logged in as')
     print(arbot.user.name)
-    print(arbot.user.id)
+    print('Servers: ' + ', '.join([str(s) for s in arbot.servers]))
     print('------')
 
 @arbot.command()
