@@ -88,10 +88,5 @@ class Pokedex():
             print("The dex is currently in use")
         return
 
-    @commands.command(pass_context=True)
-    async def emoji(self, ctx, *args):
-        embed = discord.Embed(title="Emoji Test", description="<:firaga:308684134606438401>", color=g.COLOR)
-        return await self.bot.say(embed=embed)
-
 def setup(bot):
     bot.add_cog(Pokedex(bot))
