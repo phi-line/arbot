@@ -67,7 +67,7 @@ class Games():
             win_msg = await self.bot.say("{} It's #{} {}!".format(end_msg,
                                                                   p.pkmn_id,
                                                                   p.pkmn_name.capitalize()))
-            color_img = await self.bot.upload(p.display_img(silhouette=False), delete_after=Games.TIME)
+            color_img = await self.bot.upload(p.display_img(silhouette=False))
 
             self.LOCK = False
 
@@ -77,8 +77,9 @@ class Games():
     FUSE_URL = 'http://pokemon.alexonsager.net/{0}/{1}'
     FUSE_IMG = 'http://images.alexonsager.net/pokemon/fused/{0}/{0}.{1}.png'
     FUSE_USAGE = "Pokémon must be from Gen I only\n" \
-                 "```Usage: !fuse [pkmn # or name]\n" \
-                 "e.g:   !fuse abra mew```"
+                 "Use arg '-r' to randomly fuse two Pokémon\n" \
+                 "```Usage: !fuse [p1] [p2] / !fuse -r\n" \
+                 "e.g:   !fuse abra mew / !fuse ditto 25```"
 
     @commands.command()
     async def fuse(self, p1=None, p2=None):
@@ -126,12 +127,15 @@ class Games():
             #url = FUSE_URL.format(pkmn_1['id'], pkmn_2['id'])
             img = this.FUSE_IMG.format(pkmn_1['id'], pkmn_2['id'])
 
-            # type_set1 = {i['type']['name'].capitalize() for i in pkmn_1['types']}
-            # type_set2 = {j['type']['name'].capitalize() for j in pkmn_2['types']}
-            # type_str = ' '.join(type_set1.union(type_set2))
+            type_set = {i['type']['name'] for i in pkmn_1['types']}
+            type_set2 = {j['type']['name'] for j in pkmn_2['types']}
+            type_set = type_set.union(type_set2)
+            type_str = ' '.join([g.TYPE_DICT[i] for i in type_set if i in g.TYPE_DICT])
+
+            sub_title = '{0} {1}'.format(fuse_name, type_str)
 
             embed = discord.Embed(title='', description=title, color=g.COLOR)
-            embed.add_field(name=fuse_name, value=desc, inline=True)
+            embed.add_field(name=sub_title, value=desc, inline=True)
             embed.set_image(url=img)
             msg = await self.bot.say(embed=embed)
         else:
