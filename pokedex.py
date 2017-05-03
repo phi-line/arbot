@@ -29,11 +29,17 @@ class Pokedex():
         '''
         from pokedex import Pokedex as this
         pkmn_id = 0; pkmn_name = ''; pkmn_genus = ''; pkmn_url = ''; pkmn_desc = '';
+        random_args = ['-r', '-rand', '-random']
         papi = PokeAPI()
         if not self.lock:
             #pokemon number given
-            if args and len(args) == 1:
+            if args and len(args) >= 1:
                 t = args[0]
+                if type(t) == str and t.startswith('-'):
+                    if t in random_args:
+                        p = pkmn()
+                        p.initialize()
+                        t = p.pkmn_id
                 if type(t) == int or type(t) == str:
                     self.lock = True
                     if type(t) == str:
@@ -61,17 +67,20 @@ class Pokedex():
                     pkmn_type = {i['type']['name'] for i in pt}
                     print("Displaying Pokemon {0} #{1}".format(pkmn_name, pkmn_id))
 
-                    try:
-                        s = str(pkmn_name)
-                        trans = str.maketrans('', '', punctuation)
-                        filename = ''.join((g.GIF_URL, s.translate(trans), '.gif'))
-                        a = urlopen(filename)
-                    except HTTPError:
-                        filename = ''.join((g.IMG_URL, str(pkmn_id), '.png'))
+                    if '-s' not in args[1:] and '-shiny' not in args[1:]:
+                        try:
+                            s = str(pkmn_name)
+                            trans = str.maketrans('', '', punctuation)
+                            filename = ''.join((g.GIF_URL, s.translate(trans), '.gif'))
+                            a = urlopen(filename)
+                        except HTTPError:
+                            filename = ''.join((g.IMG_URL, str(pkmn_id), '.png'))
+                    else: filename = ''.join((g.IMG_URL, 'shiny/' ,str(pkmn_id), '.png'))
 
                     type_emojis = '  '.join({g.TYPE_DICT[t] for t in pkmn_type if t in g.TYPE_DICT})
                     title = "{0} #{1} {2}".format(pkmn_name.capitalize(), pkmn_id, type_emojis)
                     sub_title = "the {0} Pokémon".format(pkmn_genus)
+
                     embed = discord.Embed(title=title, url=pkmn_url, color=g.COLOR)
                     embed.add_field(name=sub_title, value=pkmn_desc)
                     embed.set_thumbnail(url=filename)
@@ -87,6 +96,14 @@ class Pokedex():
         else:
             print("The dex is currently in use")
         return
+
+    @staticmethod
+    def std_embed(title='', url='', thumbnail_url='', sub_title='', value='', color=g.COLOR):
+        pass
+
+    @staticmethod
+    def type_embed():
+        pass
 
 def setup(bot):
     bot.add_cog(Pokedex(bot))
