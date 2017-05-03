@@ -20,9 +20,10 @@ class Pokedex():
                 "```Args :\n" \
                 "Random Pokémon -r / -random\n" \
                 "Shiny  Pokémon -s / -shiny\n\n" \
-                "Usage: !dex [p1] / '-r' ('-s')\n" \
-                "e.g:   !dex 151 / !dex mew\n" \
-                "       !dex -random -shiny```"
+                "Usage: {0}dex [p1] / '-r' ('-s')\n" \
+                "e.g:   {0}dex 151 / {0}dex mew\n" \
+                "       {0}dex -random -shiny```"
+    DEX_USAGE.format('>')
 
     @commands.command(pass_context=True)
     async def dex(self, ctx, *args):
@@ -70,9 +71,8 @@ class Pokedex():
                     pkmn_name = p['name']
                     pkmn_genus =  p['genera'][0]['genus'] #lang: en
                     pkmn_url = 'https://veekun.com/dex/pokemon/' + pkmn_name
-                    pkmn_desc = p['flavor_text_entries'][1]['flavor_text']
                     pkmn_type = {i['type']['name'] for i in pt}
-                    print("Displaying Pokemon {0} #{1}".format(pkmn_name, pkmn_id))
+                    #print("Displaying Pokemon {0} #{1}".format(pkmn_name, pkmn_id))
 
                     filename = self.get_thumbnail(pkmn_id, pkmn_name, shiny=shiny)
 
@@ -83,8 +83,8 @@ class Pokedex():
                     sub_title = "the {0} Pokémon".format(pkmn_genus)
 
                     embed = discord.Embed(title=title, url=pkmn_url, color=g.COLOR)
-                    embed.add_field(name=sub_title, value=pkmn_desc)
                     embed.set_thumbnail(url=filename)
+                    embed = this.std_embed(embed, p, sub_title)
 
                     msg = await self.bot.say(embed=embed)
 
@@ -115,9 +115,12 @@ class Pokedex():
         finally:
             return filename
 
+    #use for standard picture
     @staticmethod
-    def std_embed(title='', url='', thumbnail_url='', sub_title='', value='', color=g.COLOR):
-        pass
+    def std_embed(embed=discord.Embed, p=pkmn(), sub_title=''):
+        pkmn_desc = p['flavor_text_entries'][1]['flavor_text']
+        embed.add_field(name=sub_title, value=pkmn_desc)
+        return embed
 
     @staticmethod
     def type_embed():

@@ -77,9 +77,12 @@ class Games():
     FUSE_URL = 'http://pokemon.alexonsager.net/{0}/{1}'
     FUSE_IMG = 'http://images.alexonsager.net/pokemon/fused/{0}/{0}.{1}.png'
     FUSE_USAGE = "Pokémon must be from Gen I only\n" \
-                 "Use arg '-r' to randomly fuse two Pokémon\n" \
-                 "```Usage: !fuse [p1] [p2] / !fuse -r\n" \
-                 "e.g:   !fuse abra mew / !fuse ditto 25```"
+                 "Arg  : Random Pokemon '-r'\n" \
+                 "```Usage: {0}fuse [p1] [p2] / {0}fuse -r\n" \
+                 "e.g:   {0}fuse arbok ditto / {0}fuse ditto 25\n" \
+                 "       {0}fuse -r pikachu / {0}fuse 132 -r```"
+    FUSE_USAGE.format('>')
+
 
     @commands.command()
     async def fuse(self, p1=None, p2=None):
