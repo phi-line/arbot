@@ -1,3 +1,4 @@
+import discord
 from discord.ext import commands
 import secrets
 import traceback
@@ -28,7 +29,7 @@ async def on_command(s,e):
 @arbot.event
 async def on_command_error(error,ctx):
     em = discord.Embed(title="An Error occured",description="Sorry but I couldn't process that command properely",color=discord.Color.red())
-    await bot.send_message(ctx.message.channel,embed=em)
+    await arbot.send_message(ctx.message.channel,embed=em)
     tb = "\n".join(traceback.format_tb(error.original.__traceback__))
     print("{}: {}\n{}".format(error.original.__class__.__name__,str(error),str(tb)))
 
