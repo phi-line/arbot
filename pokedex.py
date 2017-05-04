@@ -56,7 +56,7 @@ class Pokedex():
                     try:
                         #print("Generating PokeAPI")
                         p = papi.get_pokemon_species(t)
-                        pt = papi.get_pokemon(t)['types']
+                        pt = papi.get_pokemon(t)
                     except ValueError:
                         console_txt = 'Invalid Pokémon: ' + str(t) + ' given'
                         print(console_txt)
@@ -71,12 +71,12 @@ class Pokedex():
                     pkmn_name = p['name']
                     pkmn_genus =  p['genera'][0]['genus'] #lang: en
                     pkmn_url = 'https://veekun.com/dex/pokemon/' + pkmn_name
-                    pkmn_type = {i['type']['name'] for i in pt}
+                    pkmn_type = {i['type']['name'] for i in pt['types']}
                     #print("Displaying Pokemon {0} #{1}".format(pkmn_name, pkmn_id))
 
                     filename = self.get_thumbnail(pkmn_id, pkmn_name, shiny=shiny)
 
-                    type_emojis = '  '.join({g.TYPE_DICT[t] for t in pkmn_type if t in g.TYPE_DICT})
+                    type_emojis = ' '.join({g.TYPE_DICT[t] for t in pkmn_type if t in g.TYPE_DICT})
                     if shiny: type_emojis += g.S_ICON
 
                     title = "{0} #{1} {2}".format(pkmn_name.capitalize(), pkmn_id, type_emojis)
@@ -85,6 +85,7 @@ class Pokedex():
                     embed = discord.Embed(title=title, url=pkmn_url, color=g.COLOR)
                     embed.set_thumbnail(url=filename)
                     embed = this.std_embed(embed, p, sub_title)
+                    embed = this.type_embed(embed, type_set=pkmn_type, sub_title='Type Chart:')
 
                     msg = await self.bot.say(embed=embed)
 
@@ -118,13 +119,32 @@ class Pokedex():
     #use for standard picture
     @staticmethod
     def std_embed(embed=discord.Embed, p=pkmn(), sub_title=''):
-        pkmn_desc = p['flavor_text_entries'][1]['flavor_text']
+        pkmn_desc = p['flavor_text_entries'][1]['flavor_text'].replace('\n', ' ')
         embed.add_field(name=sub_title, value=pkmn_desc)
         return embed
 
     @staticmethod
-    def type_embed():
-        pass
+    def type_embed(embed=discord.Embed, type_set={}, sub_title=''):
+        #first get all the type info for the pokemon
+        #for each type generate Weakness chart
+
+        p = PokeAPI()
+
+        z = dict()
+        for t in type_set:
+            j = p.get_type(t)
+            y = {dt: [val['name'] for val in vals] for dt, vals in j['damage_relations'].items() \
+                 if 'from' in str(dt)}
+            y = {k: v for k, v in y.items() if v}
+            z.update(y)
+
+        builder = ''
+        for key in y:
+            builder += '{0}: {1}\n'.format(key.replace('_', ' '),
+                                         ' '.join({g.TYPE_DICT[t] for t in y[key] if t in g.TYPE_DICT}))
+
+        embed.add_field(name=sub_title, value=builder)
+        return embed
 
 def setup(bot):
     bot.add_cog(Pokedex(bot))
