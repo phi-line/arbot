@@ -21,9 +21,8 @@ class Pokedex():
                 "Random Pokémon -r / -random\n" \
                 "Shiny  Pokémon -s / -shiny\n\n" \
                 "Usage: {0}dex [p1] / '-r' ('-s')\n" \
-                "e.g:   {0}dex 151 / {0}dex mew\n" \
+                "e.g  : {0}dex 151 / {0}dex mew\n" \
                 "       {0}dex -random -shiny```"
-    DEX_USAGE.format('>')
 
     @commands.command(pass_context=True)
     async def dex(self, ctx, *args):
@@ -33,6 +32,7 @@ class Pokedex():
         e.g:   !dex 151 / !dex mew
         '''
         from pokedex import Pokedex as this
+        dex_usage = this.DEX_USAGE.format(self.bot.command_prefix)
         pkmn_id = 0; pkmn_name = ''; pkmn_genus = ''; pkmn_url = ''; pkmn_desc = '';
         random_args = ['-r', '-rand', '-random']
         shiny = False
@@ -62,7 +62,7 @@ class Pokedex():
                         print(console_txt)
 
                         title = 'What the zzzt?! Invalid Pokémon name / ID'
-                        msg = await self.bot.say(embed=rtm.rotom_embed(title,this.DEX_USAGE))
+                        msg = await self.bot.say(embed=rtm.rotom_embed(title,dex_usage))
 
                         self.lock = False
                         return
@@ -93,7 +93,7 @@ class Pokedex():
                     return
             else:
                 title = 'Kzzzzrrt?! Invalid usage! Zzt-zzt!'
-                msg = await self.bot.say(embed=rtm.rotom_embed(title,this.DEX_USAGE))
+                msg = await self.bot.say(embed=rtm.rotom_embed(title,dex_usage))
                 return
         else:
             print("The dex is currently in use")
