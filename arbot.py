@@ -19,7 +19,7 @@ async def on_ready():
     print('Logged in as')
     print(arbot.user.name)
     print('Servers: ' + ', '.join([str(s) for s in arbot.servers]))
-    #await arbot.edit_profile(avatar=open('./profile_pics/agneton.png', 'rb').read())
+    #await arbot.edit_profile(avatar=open('./profile_pics/arygon.png', 'rb').read())
     print('------')
     
 @arbot.event

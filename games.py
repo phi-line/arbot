@@ -77,11 +77,10 @@ class Games():
     FUSE_URL = 'http://pokemon.alexonsager.net/{0}/{1}'
     FUSE_IMG = 'http://images.alexonsager.net/pokemon/fused/{0}/{0}.{1}.png'
     FUSE_USAGE = "Pokémon must be from Gen I only\n" \
-                 "Arg  : Random Pokemon '-r'\n" \
-                 "```Usage: {0}fuse [p1] [p2] / {0}fuse -r\n" \
-                 "e.g:   {0}fuse arbok ditto / {0}fuse ditto 25\n" \
+                 "```Arg  : Random Pokemon '-r'\n" \
+                 "Usage: {0}fuse [p1] [p2] / {0}fuse -r\n" \
+                 "e.g  : {0}fuse arbok ditto / {0}fuse ditto 25\n" \
                  "       {0}fuse -r pikachu / {0}fuse 132 -r```"
-    FUSE_USAGE.format('>')
 
 
     @commands.command()
@@ -93,6 +92,7 @@ class Games():
         e.g:   !fuse abra mew / !fuse 1 25
         '''
         from games import Games as this
+        fuse_usage = this.FUSE_USAGE.format(self.bot.command_prefix)
         random_args = ['-r', '-rand', '-random']; r = False
         if p1 and not p2:
             if p1 in random_args:
@@ -117,7 +117,7 @@ class Games():
                 print(console_txt)
 
                 title = "Zzzrt?! It'zzz an unidentified Pokémon!"
-                msg = await self.bot.say(embed=rtm.rotom_embed(title,this.FUSE_USAGE))
+                msg = await self.bot.say(embed=rtm.rotom_embed(title,fuse_usage))
                 return
 
             pk1_name = pkmn_1['name']; pk2_name = pkmn_2['name']
@@ -151,7 +151,7 @@ class Games():
             msg = await self.bot.say(embed=embed)
         else:
             title = 'Kzzzzrrt?! Invalid usage! Zzt-zzt!'
-            msg = await self.bot.say(embed=rtm.rotom_embed(title, this.FUSE_USAGE))
+            msg = await self.bot.say(embed=rtm.rotom_embed(title, fuse_usage))
         return
 
 def setup(bot):
