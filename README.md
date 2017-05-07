@@ -1,5 +1,5 @@
 beep boop this is arbot, a Python bot that serves Pokemon information to its users.
-It uses discord API to deliver this information
+It uses discord python API and PokeAPI
 
 These are the things that arbot can do:
 Pokedex:
