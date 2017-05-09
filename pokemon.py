@@ -50,6 +50,17 @@ class pkmn(object):
         #self.initialize() #initialize random id and derived name
 
     def initialize(self,gen=0,id=0):
+        '''
+        Initializes a pokemon object for use in the Pokemon game.
+
+        If a pokemon gen is not provided, it will use all pokemon.
+        Otherwise it will only pick only from that gen
+
+        If an ID is provided, it will generate relevant information for that pokemon in this object
+        :param gen: int - The generation (1-6) that the randomizer should choose from
+        :param id: int  - The specific id that the pokemon object should fetch info for
+        :return:
+        '''
         #gen selector
         if gen >= 1 and gen <= 6:
             self.min = self.GEN_DICT[gen][0]
@@ -74,18 +85,19 @@ class pkmn(object):
         self.LOCK = True #sets lock as long as game is still being played
         return
 
-
-    def display_message(self):
-        return self.MESSAGE
+    def generate_id(self):
+        return randint(self.min, self.max)
 
     def display_img(self, silhouette = False):
+        '''
+        Returns the local image path of this Object's pokemon
+        :param silhouette: bool - Generate and return the path of a silhouetted Pokemon?
+        :return: img: str       - The local image path of this Pokemon
+        '''
         img = self.get_img_path(self.pkmn_id)
         if silhouette:
             img = self.generate_silhouette(img)
         return img
-
-    def generate_id(self):
-        return randint(self.min, self.max)
 
     @staticmethod
     def get_img_path(id, folder=DEX):
@@ -100,7 +112,18 @@ class pkmn(object):
             return join(path, files[0])
 
     @staticmethod
-    def generate_silhouette(image_path, folder=KURO):
+    def generate_silhouette(image_path : str, folder=KURO):
+        '''
+        This method takes the image path from display_img() and then converts it to a silhouette using PIL
+
+        If the image is already in the cache it will return the path of that image
+        If the image is not found it will perform pre pixel modifications to the image.
+        It will then save the image to the cache and return the path to that image
+
+        :param image_path: str  - The image path of the pokemon
+        :param folder: str      - The folder path of the cache
+        :return: new_path : str - The path to the silhouetted Pokemon
+        '''
         filename = basename(image_path)
         new_path = join(dirname(abspath(__file__)), folder, filename)
         # don't do any work if there is already an image cached

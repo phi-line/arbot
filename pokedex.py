@@ -100,7 +100,14 @@ class Pokedex():
         return
 
     @staticmethod
-    def get_thumbnail(id, name, shiny=False):
+    def get_thumbnail(id : int, name : str, shiny=False):
+        '''
+        This function returns a hotlink of the Pokemon's
+        :param id: int     - the pokemon's id
+        :param name: str   - the pokemon's name
+        :param shiny: bool - get shiny thumbnail?
+        :return: filename: string - hotlink of the requested thumbnail
+        '''
         filename = ''
         try:
             s = str(name)
@@ -118,18 +125,31 @@ class Pokedex():
 
     #use for standard picture
     @staticmethod
-    def std_embed(embed=discord.Embed, p=pkmn(), sub_title=''):
+    def std_embed(embed : discord.Embed, p : pkmn, sub_title : str):
+        '''
+        Takes an embed object as a parameter and then adds pokemon flavor text to it as a new field
+        :param embed: discord.Embed
+        :param p: pkmn
+        :param sub_title: string      - The string to set as the title of the new field
+        :return: embed: discord.Embed - A copy of the given embed object with the new field attatched
+        '''
         pkmn_desc = p['flavor_text_entries'][1]['flavor_text'].replace('\n', ' ')
         embed.add_field(name=sub_title, value=pkmn_desc)
         return embed
 
     @staticmethod
-    def type_embed(embed=discord.Embed, type_set={}, sub_title=''):
+    def type_embed(embed : discord.Embed, type_set : set, sub_title : str):
+        '''
+        Takes an embed object as a parameter and then adds pokemon type emojis to it as a new field
+        :param embed: discord.Embed
+        :param type_set: set - containing all the types that this pokemon is
+        :param sub_title: string       - The string to set as the title of the new field
+        :return: embed: discord.Embed  - A copy of the given embed object with the new field attatched
+        '''
+
         #first get all the type info for the pokemon
         #for each type generate Weakness chart
-
         p = PokeAPI()
-
         z = dict()
         for t in type_set:
             j = p.get_type(t)
