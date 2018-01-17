@@ -99,6 +99,9 @@ class pkmn(object):
             img = self.generate_silhouette(img)
         return img
 
+    def display_message(self):
+        return self.MESSAGE
+
     @staticmethod
     def get_img_path(id, folder=DEX):
         path = join(dirname(abspath(__file__)), folder)

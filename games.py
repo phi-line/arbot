@@ -130,10 +130,12 @@ class Games():
             # print(ratio)
             fuse_name = pk1_name[:int(ratio*lp1)] + pk2_name[int(ratio*lp2):]
             fuse_name = fuse_name.capitalize()
-            pk1_genus = papi.get_pokemon_species(p1)['genera'][0]['genus']
-            pk2_genus = papi.get_pokemon_species(p2)['genera'][0]['genus']
+            pk1_genus = papi.get_pokemon_species(p1)['genera'][2]['genus']
+            pk1_genus = pk1_genus.split()[:-1]
+            pk1_genus = ''.join(pk1_genus)
+            pk2_genus = papi.get_pokemon_species(p2)['genera'][2]['genus']
 
-            desc = "the {0} {1} Pokémon".format(pk1_genus, pk2_genus)
+            desc = "the {0} {1}".format(pk1_genus, pk2_genus)
 
             #url = FUSE_URL.format(pkmn_1['id'], pkmn_2['id'])
             img = this.FUSE_IMG.format(pkmn_1['id'], pkmn_2['id'])

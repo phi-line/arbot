@@ -21,7 +21,7 @@ async def on_ready():
     print('Servers: ' + ', '.join([str(s) for s in arbot.servers]))
     #await arbot.edit_profile(avatar=open('./profile_pics/arygon.png', 'rb').read())
     print('------')
-    
+
 @arbot.event
 async def on_command(s,e):
     print("{0.name} used >{1} in {2.name} (Channel #{3})".format(e.message.author,s,e.message.server,e.message.channel))
@@ -48,12 +48,6 @@ async def unload(extension_name : str):
     """Unloads an extension."""
     arbot.unload_extension(extension_name)
     await arbot.say("{} unloaded.".format(extension_name))
-
-@arbot.command()
-async def repeat(times : int, content='repeating...'):
-    """Repeats a message multiple times."""
-    for i in range(times):
-        await arbot.say(content)
 
 @arbot.command()
 async def ti():
