@@ -69,10 +69,10 @@ class Pokedex():
 
                     pkmn_id = p['id']
                     pkmn_name = p['name']
-                    pkmn_genus =  p['genera'][0]['genus'] #lang: en
+                    pkmn_genus =  p['genera'][2]['genus'] #lang: en
                     pkmn_url = 'https://veekun.com/dex/pokemon/' + pkmn_name
                     pkmn_type = {i['type']['name'] for i in pt['types']}
-                    #print("Displaying Pokemon {0} #{1}".format(pkmn_name, pkmn_id))
+                    # print("Displaying Pokemon {0} #{1}".format(pkmn_name, pkmn_id))
 
                     filename = self.get_thumbnail(pkmn_id, pkmn_name, shiny=shiny)
 
@@ -80,7 +80,7 @@ class Pokedex():
                     if shiny: type_emojis += g.S_ICON
 
                     title = "{0} #{1} {2}".format(pkmn_name.capitalize(), pkmn_id, type_emojis)
-                    sub_title = "the {0} Pokémon".format(pkmn_genus)
+                    sub_title = "the {0}".format(pkmn_genus)
 
                     embed = discord.Embed(title=title, url=pkmn_url, color=g.COLOR)
                     embed.set_thumbnail(url=filename)
@@ -133,7 +133,7 @@ class Pokedex():
         :param sub_title: string      - The string to set as the title of the new field
         :return: embed: discord.Embed - A copy of the given embed object with the new field attatched
         '''
-        pkmn_desc = p['flavor_text_entries'][1]['flavor_text'].replace('\n', ' ')
+        pkmn_desc = p['flavor_text_entries'][2]['flavor_text'].replace('\n', ' ')
         embed.add_field(name=sub_title, value=pkmn_desc)
         return embed
 
