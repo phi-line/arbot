@@ -1,4 +1,6 @@
 sugimori/
+kuro_cache
 .idea/
 secrets.py
 PokeAPI.py
+snek.py
