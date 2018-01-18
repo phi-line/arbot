@@ -1,45 +1,44 @@
-beep boop this is arbot, a Python bot that serves Pokemon information to its users.
-It uses discord python API and PokeAPI
+# arbot
+> a Discord bot that serves Pokémon data and games to its users
 
-These are the things that arbot can do:
-Pokedex:
-  dex    PokeDex entry for any PKMN
-Games:
-  fuse   Fuse two Gen I Pokémon together!
-  wtp    Play 'Who's that Pokemon' game
-Search:
-  tw     Twitch username lookup
-  yt     YouTube search
-  py     Python 3 documentation search
-  dpy    Discord.py documentation search
-  ddg    DuckDuckGo search
-No Category:
-  unload Unloads an extension.
-  load   Loads an extension.
-  repeat Repeats a message multiple times.
-  ti     Display the bot's time (PST)
-  help   Shows this message.
+Made with:
+* discord.py
+* pokéAPI
+
+## Main features
+### Pokédex
+> Arbot can provide information about any Pokémon using `>dex`:
+
+**Usage**: `>dex pkmn name / id`
+
+Example: `>dex arbok` *or* `>dex 24`
+
+![meow](docs/assets/dex.png)
   
-[Pokedex]
-PokeDex entry for any PKMN
-Usage: !dex [pkmn # or name]
-e.g:   !dex 151 / !dex mew
+### Who's that Pokémon
+> Play the classic guessing game seen on the anime using `>wtp`. A Pokémon will be shrouded in darkness and it's up to you and your friends to compete for the correct one.
 
-[Games]
-Fuse two Gen I Pokémon together!          Play 'Who's that Pokemon' game
-Credits: Alex Onsager - fused images      Players will race to guess Pokemon sillouettes
-Usage: !fuse [p1] [p2]                    Usage: !wtp (gen #)
-e.g:   !fuse abra mew / !fuse 1 25        e.g:   !wtp / !wtp 1
+**Usage**: `>wtp (optional: gen id)`
 
-[Search]
-Twitch username lookup                    YouTube search
-Usage: !tw [username]                     Usage: !yt [query]
-e.g:   !tw phi_liney                      e.g:   !yt cat videos
+Example: `>wtp` *or* `>wtp 1`
 
-Python 3 documentation search             Discord.py documentation search    
-Usage: !py [query]                        Usage: !dpy [query]
-e.g:   !py dictionary                     e.g:   !dpy embed
+|  ![](docs/assets/arbok-blk.png)  |  ![](docs/assets/arbok.png)  |
+|:---:|:---:|
 
-DuckDuckGo search
-Usage: !ddg [query]
-e.g:   !ddg cat pictures
+### Fuse Pokémon
+> Combine two Pokémon together with the hilarious app made by Alex Onsager. Use `>fuse` to combine any two Generation 1 Pokémon.
+
+**Usage** `>fuse [pkmn 1] [pkmn 2]`
+
+Example: `>fuse arbok porygon` *or* `>fuse 24 137`
+
+![](docs/assets/arygon.png)
+
+## Other commands
+|  Twitch user Lookup  |  DuckDuckGo search  | YouTube Search |
+|:---|:---|:---|
+| `>tw [username]` | `>ddg [query]` | `>yt [query]` |
+
+|  Python documentation  |  Discord.py documentation  |
+|:---|:---|
+| `>py [query]` | `>dpy [query]` |
