@@ -50,6 +50,7 @@ class Games():
                        not msg.content.startswith('>')
 
             def check_guess(g):
+                if not g: return False
                 guess_str = g.content.lower()
                 return guess_str == p.pkmn_name
 
@@ -63,7 +64,8 @@ class Games():
 
             timeout = 0
             while timeout < Games.TIME:
-                guess = await self.bot.wait_for_message(check=check)
+                diff = (Games.TIME - timeout) / 1000
+                guess = await self.bot.wait_for_message(timeout=diff, check=check)
                 if check_guess(guess):
                     end_msg = 'You win!'
                     break
@@ -71,11 +73,9 @@ class Games():
                     timeout = get_time() - start_time
                     diff = (Games.TIME - timeout)/1000
 
+                    end_msg = 'You Lose!'
                     await self.bot.delete_message(timer_msg)
                     timer_msg = await self.bot.say('You have {:.2f} seconds to guess'.format(diff))
-                    end_msg = 'You Lose!'
-                    if timeout > Games.TIME:
-                        break
 
             await self.bot.delete_messages((intro_msg, kuro_img, timer_msg))
 
