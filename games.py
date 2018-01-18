@@ -3,6 +3,7 @@ from discord.ext import commands
 
 import re
 from random import randint
+import time
 
 from PokeAPI import PokeAPI
 from pokemon import pkmn
@@ -11,7 +12,7 @@ from globals import Globals as g
 
 class Games():
     COLOR = 0xe74c3c
-    TIME = 15
+    TIME = 20000
 
     def __init__(self, bot):
         self.bot = bot
@@ -44,25 +45,39 @@ class Games():
                 return
 
             def check(msg):
-                return msg.author != (self.bot.user.name) and \
+                return msg.author != self.bot.user.name and \
                        re.match(r'^\S+$', msg.content) and \
-                       not msg.content.startswith('!')
+                       not msg.content.startswith('>')
 
-            def check_guess(guess):
-                guess_str = guess.content.lower()
+            def check_guess(g):
+                guess_str = g.content.lower()
                 return guess_str == p.pkmn_name
 
-            timer_msg = await self.bot.say('You have {} seconds to guess'.format(Games.TIME))
-            guess = await self.bot.wait_for_message(timeout=Games.TIME, check=check)
-            await self.bot.delete_messages((intro_msg, kuro_img, timer_msg))
+            def get_time():
+                return int(round(time.time() * 1000))
 
             end_msg = ''
-            if guess is None:
-                end_msg = 'Time out!'
-            elif check_guess(guess):
-                end_msg = 'You win!'
-            else:
-                end_msg = 'You lose!'
+
+            timer_msg = await self.bot.say('You have {} seconds to guess'.format(int(Games.TIME/1000)))
+            start_time = get_time()
+
+            timeout = 0
+            while timeout < Games.TIME:
+                guess = await self.bot.wait_for_message(check=check)
+                if check_guess(guess):
+                    end_msg = 'You win!'
+                    break
+                else:
+                    timeout = get_time() - start_time
+                    diff = (Games.TIME - timeout)/1000
+
+                    await self.bot.delete_message(timer_msg)
+                    timer_msg = await self.bot.say('You have {:.2f} seconds to guess'.format(diff))
+                    end_msg = 'You Lose!'
+                    if timeout > Games.TIME:
+                        break
+
+            await self.bot.delete_messages((intro_msg, kuro_img, timer_msg))
 
             win_msg = await self.bot.say("{} It's #{} {}!".format(end_msg,
                                                                   p.pkmn_id,
