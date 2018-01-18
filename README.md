@@ -1,9 +1,8 @@
-# arbot
+# <img src="docs/assets/icon.png" width="20"> arbot
 > a Discord bot that serves Pokémon data and games to its users
 
 Made with [discord.py](https://github.com/Rapptz/discord.py) and [PokeAPI](https://pokeapi.co/)
 
-# Main features:
 ## Pokédex
 > Arbot can provide information about any Pokémon using `>dex`
 
