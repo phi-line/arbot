@@ -2,7 +2,6 @@ import discord
 from globals import Globals as g
 
 class Rotom():
-
     @staticmethod
     def rotom_embed(title : str, desc : str):
         '''
