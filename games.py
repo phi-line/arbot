@@ -83,7 +83,6 @@ class Games():
                                                                   p.pkmn_id,
                                                                   p.pkmn_name.capitalize()))
             color_img = await self.bot.upload(p.display_img(silhouette=False))
-
             self.LOCK = False
 
         else: print("A game is currently in session")

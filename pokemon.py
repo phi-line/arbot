@@ -7,7 +7,7 @@ Upon a correct guess or when the time runs out, the correct pokemon
 will display with the corresponding win or loss message.
 
 Features might include something that lets you guess from a 
-specific gen of pokemon rather than all of them. For nows we will
+specific gen of pokemon rather than all of them. For now we will
 only include gen one
 '''
 from os import listdir

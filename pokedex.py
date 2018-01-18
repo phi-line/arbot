@@ -123,7 +123,6 @@ class Pokedex():
         finally:
             return filename
 
-    #use for standard picture
     @staticmethod
     def std_embed(embed : discord.Embed, p : pkmn, sub_title : str):
         '''
@@ -133,7 +132,8 @@ class Pokedex():
         :param sub_title: string      - The string to set as the title of the new field
         :return: embed: discord.Embed - A copy of the given embed object with the new field attatched
         '''
-        pkmn_desc = p['flavor_text_entries'][2]['flavor_text'].replace('\n', ' ')
+        pkmn_desc = [entry for entry in p['flavor_text_entries'] if entry['language']['name'] == 'en'][0]['flavor_text']
+        pkmn_desc = pkmn_desc.replace('\n', ' ')
         embed.add_field(name=sub_title, value=pkmn_desc)
         return embed
 
