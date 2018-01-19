@@ -74,8 +74,7 @@ class Games():
                     diff = (Games.TIME - timeout)/1000
 
                     end_msg = 'You Lose!'
-                    await self.bot.delete_message(timer_msg)
-                    timer_msg = await self.bot.say('You have {:.2f} seconds to guess'.format(diff))
+                    await self.bot.edit_message(timer_msg, new_content='You have {:.2f} seconds to guess'.format(diff))
 
             await self.bot.delete_messages((intro_msg, kuro_img, timer_msg))
 
