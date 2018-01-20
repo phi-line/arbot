@@ -1,4 +1,6 @@
 class Globals():
+    IS_BOT = False
+
     TIME = 15 #time for a message to disappear
     COLOR = 0xe74c3c #color for embed (red)
 

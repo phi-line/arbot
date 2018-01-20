@@ -45,6 +45,7 @@ class Games():
                 return
 
             def check(msg):
+                if '#9773' in str(msg.author): return False
                 return msg.author != self.bot.user.name and \
                        re.match(r'^\S+$', msg.content) and \
                        not msg.content.startswith('>')
@@ -76,7 +77,7 @@ class Games():
                     end_msg = 'You Lose!'
                     await self.bot.edit_message(timer_msg, new_content='You have {:.2f} seconds to guess'.format(diff))
 
-            await self.bot.delete_messages((intro_msg, kuro_img, timer_msg))
+            g.IS_BOT and await self.bot.delete_messages((intro_msg, kuro_img, timer_msg))
 
             win_msg = await self.bot.say("{} It's #{} {}!".format(end_msg,
                                                                   p.pkmn_id,

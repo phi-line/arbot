@@ -1,6 +1,8 @@
 import discord
 from discord.ext import commands
 import secrets
+from globals import Globals as g
+
 import traceback
 from datetime import datetime
 
@@ -12,7 +14,7 @@ There are a number of utility commands being showcased here.'''
 # this specifies what extensions to load when the arbot starts up
 startup_extensions = ["search", "games", "pokedex"]
 
-arbot = commands.Bot(command_prefix='>', description=description, )
+arbot = commands.Bot(command_prefix='>', description=description)
 
 @arbot.event
 async def on_ready():
@@ -27,8 +29,8 @@ async def on_command(s,e):
 
 @arbot.event
 async def on_command_error(error,ctx):
-    em = discord.Embed(title="An Error occured",description="Sorry but I couldn't process that command properely",color=discord.Color.red())
-    await arbot.send_message(ctx.message.channel,embed=em)
+    # em = discord.Embed(title="An Error occured",description="Sorry but I couldn't process that command properely",color=discord.Color.red())
+    # await arbot.send_message(ctx.message.channel,embed=em)
     tb = "\n".join(traceback.format_tb(error.original.__traceback__))
     print("{}: {}\n{}".format(error.original.__class__.__name__,str(error),str(tb)))
 
@@ -68,4 +70,5 @@ if __name__ == "__main__":
             exc = '{}: {}'.format(type(e).__name__, e)
             print('Failed to load extension {}\n{}'.format(extension, exc))
 
-    arbot.run(secrets.BOT_TOKEN)
+    token = secrets.BOT_TOKEN if g.IS_BOT else secrets.USER_TOKEN
+    arbot.run(token, bot=g.IS_BOT)
