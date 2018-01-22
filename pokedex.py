@@ -6,8 +6,9 @@ from string import punctuation
 from urllib.error import HTTPError
 from urllib.request import urlopen
 
-from PokeAPI import PokeAPI
-from pokemon import pkmn as pkmn
+import pokebase as pb
+from random import randint
+
 from globals import Globals as g
 from exceptions import Rotom as rtm
 
@@ -24,6 +25,8 @@ class Pokedex():
                 "e.g  : {0}dex 151 / {0}dex mew\n" \
                 "       {0}dex -random -shiny```"
 
+    MAX_PKMN = 721
+
     @commands.command(pass_context=True)
     async def dex(self, ctx, *args):
         '''
@@ -38,14 +41,11 @@ class Pokedex():
         shiny = False
 
         if not self.lock:
-            papi = PokeAPI()
             if args and len(args) >= 1:
                 t = args[0]
                 if type(t) == str and t.startswith('-'):
                     if t in random_args:
-                        p = pkmn()
-                        p.initialize()
-                        t = p.pkmn_id
+                        t = randint(Pokedex.MAX_PKMN)
                 if '-s' in args[1:] or '-shiny' in args[1:]:
                     shiny = True
                 if type(t) == int or type(t) == str:
@@ -54,9 +54,8 @@ class Pokedex():
                         t = t.lower()
 
                     try:
-                        #print("Generating PokeAPI")
-                        p = papi.get_pokemon_species(t)
-                        pt = papi.get_pokemon(t)
+                        species = pb.pokemon_species(t)
+                        pokemon = pb.pokemon(t)
                     except ValueError:
                         console_txt = 'Invalid Pokémon: ' + str(t) + ' given'
                         print(console_txt)
@@ -67,16 +66,18 @@ class Pokedex():
                         self.lock = False
                         return
 
-                    pkmn_id = p['id']
-                    pkmn_name = p['name']
-                    pkmn_genus =  p['genera'][2]['genus'] #lang: en
+                    pkmn_id = species.id
+                    pkmn_name = species.name
+
+                    pkmn_genus = species.genera[2].genus
                     pkmn_url = 'https://veekun.com/dex/pokemon/' + pkmn_name
-                    pkmn_type = {i['type']['name'] for i in pt['types']}
                     # print("Displaying Pokemon {0} #{1}".format(pkmn_name, pkmn_id))
 
                     filename = self.get_thumbnail(pkmn_id, pkmn_name, shiny=shiny)
 
+                    pkmn_type = {i.type.name for i in pokemon.types}
                     type_emojis = ' '.join({g.TYPE_DICT[t] for t in pkmn_type if t in g.TYPE_DICT})
+
                     if shiny: type_emojis += g.S_ICON
 
                     title = "{0} #{1} {2}".format(pkmn_name.capitalize(), pkmn_id, type_emojis)
@@ -84,8 +85,8 @@ class Pokedex():
 
                     embed = discord.Embed(title=title, url=pkmn_url, color=g.COLOR)
                     embed.set_thumbnail(url=filename)
-                    embed = this.std_embed(embed, p, sub_title)
-                    embed = this.type_embed(embed, type_set=pkmn_type, sub_title='Type Chart:')
+                    embed = this.std_embed(embed, species, sub_title)
+                    # embed = this.type_embed(embed, type_set=pkmn_type, sub_title='Type Chart:')
 
                     msg = await self.bot.say(embed=embed)
 
@@ -124,7 +125,7 @@ class Pokedex():
             return filename
 
     @staticmethod
-    def std_embed(embed : discord.Embed, p : pkmn, sub_title : str):
+    def std_embed(embed : discord.Embed, p : dict, sub_title : str):
         '''
         Takes an embed object as a parameter and then adds pokemon flavor text to it as a new field
         :param embed: discord.Embed
@@ -132,7 +133,7 @@ class Pokedex():
         :param sub_title: string      - The string to set as the title of the new field
         :return: embed: discord.Embed - A copy of the given embed object with the new field attatched
         '''
-        pkmn_desc = [entry for entry in p['flavor_text_entries'] if entry['language']['name'] == 'en'][0]['flavor_text']
+        pkmn_desc = [entry for entry in p.flavor_text_entries if entry.language.name == 'en'][0].flavor_text
         pkmn_desc = pkmn_desc.replace('\n', ' ')
         embed.add_field(name=sub_title, value=pkmn_desc)
         return embed
@@ -149,11 +150,11 @@ class Pokedex():
 
         #first get all the type info for the pokemon
         #for each type generate Weakness chart
-        p = PokeAPI()
         z = dict()
+        print(type_set)
         for t in type_set:
-            j = p.get_type(t)
-            y = {dt: [val['name'] for val in vals] for dt, vals in j['damage_relations'].items() \
+            j = pb.type_(t)
+            y = {dt: [val.name for val in vals] for dt, vals in j.damage_relations \
                  if 'from' in str(dt)}
             y = {k: v for k, v in y.items() if v}
             z.update(y)

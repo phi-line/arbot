@@ -1,5 +1,5 @@
 class Globals():
-    IS_BOT = False
+    IS_BOT = True
 
     TIME = 15 #time for a message to disappear
     COLOR = 0xe74c3c #color for embed (red)
@@ -11,7 +11,6 @@ class Globals():
     S_GIF_URL = 'http://www.pokestadium.com/sprites/xy/shiny/'
     DEX_URL = 'http://cdn.bulbagarden.net/upload/thumb/3/36/479Rotom-Pok%C3%A9dex.png/160px-479Rotom-Pok%C3%A9dex.png'
     S_ICON = '<:i_shiny:309407527001522177>'
-
 
     TYPE_DICT = {'bug':     '<:t_bug:308684134585335808>',     'dark':     '<:t_dark:308684134677610496>',
                  'dragon':  '<:t_dragon:308684134337740802>',  'electric': '<:t_electric:308684134375620610>',
