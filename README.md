@@ -1,4 +1,4 @@
-# <img src="docs/assets/icon.png" width="20"> arbot
+# <img src="https://raw.githubusercontent.com/phi-line/arbot/master/docs/assets/icon.png" width="20"> arbot
 > a Discord bot that serves Pokémon data and games to its users
 
 Made with [discord.py](https://github.com/Rapptz/discord.py) and [PokeAPI](https://pokeapi.co/)
@@ -10,7 +10,7 @@ Made with [discord.py](https://github.com/Rapptz/discord.py) and [PokeAPI](https
 
 Example: `>dex arbok` *or* `>dex 24`
 
-<img src="docs/assets/dex.png" width="600">
+<img src="https://raw.githubusercontent.com/phi-line/arbot/master/docs/assets/dex.png" width="600">
 
 Comes with custom emojis for types:
 
@@ -26,7 +26,7 @@ Comes with custom emojis for types:
 
 Example: `>wtp` *or* `>wtp 1`
 
-|  <img src="docs/assets/arbok-blk.png" width="300">  |  <img src="docs/assets/arbok.png" width="300">  |
+|  <img src="https://raw.githubusercontent.com/phi-line/arbot/master/docs/assets/arbok-blk.png" width="300">  |  <img src="https://raw.githubusercontent.com/phi-line/arbot/master/docs/assets/arbok.png" width="300">  |
 |:---:|:---:|
 
 ## Fuse Pokémon
@@ -36,7 +36,7 @@ Example: `>wtp` *or* `>wtp 1`
 
 Example: `>fuse arbok porygon` *or* `>fuse 24 137`
 
-<img src="docs/assets/arygon.png" width="250">
+<img src="https://raw.githubusercontent.com/phi-line/arbot/master/docs/assets/arygon.png" width="250">
 
 ## Other commands
 |  Twitch user Lookup  |  DuckDuckGo search  | YouTube Search |
