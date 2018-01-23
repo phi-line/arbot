@@ -10,6 +10,7 @@ import pokebase as pb
 from random import randint
 
 from globals import Globals as g
+from pkmnTypes import PkmnTypes as t
 from exceptions import Rotom as rtm
 
 class Pokedex():
@@ -75,7 +76,8 @@ class Pokedex():
 
                     filename = self.get_thumbnail(pkmn_id, pkmn_name, shiny=shiny)
 
-                    pkmn_type = {i.type.name for i in pokemon.types}
+                    pkmn_type = [x.type.name for x in pokemon.types]
+                    pkmn_abilities = [x.ability.name for x in pokemon.abilities]
                     type_emojis = ' '.join({g.TYPE_DICT[t] for t in pkmn_type if t in g.TYPE_DICT})
 
                     if shiny: type_emojis += g.S_ICON
@@ -86,7 +88,7 @@ class Pokedex():
                     embed = discord.Embed(title=title, url=pkmn_url, color=g.COLOR)
                     embed.set_thumbnail(url=filename)
                     embed = this.std_embed(embed, species, sub_title)
-                    # embed = this.type_embed(embed, type_set=pkmn_type, sub_title='Type Chart:')
+                    embed = this.type_embed(embed, types=pkmn_type, abilities=pkmn_abilities, sub_title='Type Chart:')
 
                     msg = await self.bot.say(embed=embed)
 
@@ -101,7 +103,7 @@ class Pokedex():
         return
 
     @staticmethod
-    def get_thumbnail(id : int, name : str, shiny=False):
+    def get_thumbnail(id: int, name: str, shiny=False):
         '''
         This function returns a hotlink of the Pokemon's
         :param id: int     - the pokemon's id
@@ -114,18 +116,18 @@ class Pokedex():
             s = str(name)
             trans = str.maketrans('', '', punctuation)
             if not shiny:
-                filename =   ''.join((g.GIF_URL, s.translate(trans), '.gif'))
+                filename = ''.join((g.GIF_URL, s.translate(trans), '.gif'))
             else: filename = ''.join((g.S_GIF_URL, s.translate(trans), '.gif'))
             a = urlopen(filename)
         except HTTPError:
             if not shiny:
-                filename =   ''.join((g.IMG_URL, str(id), '.png'))
+                filename = ''.join((g.IMG_URL, str(id), '.png'))
             else: filename = ''.join((g.S_IMG_URL, str(id), '.png'))
         finally:
             return filename
 
     @staticmethod
-    def std_embed(embed : discord.Embed, p : dict, sub_title : str):
+    def std_embed(embed: discord.Embed, p: dict, sub_title: str):
         '''
         Takes an embed object as a parameter and then adds pokemon flavor text to it as a new field
         :param embed: discord.Embed
@@ -139,7 +141,7 @@ class Pokedex():
         return embed
 
     @staticmethod
-    def type_embed(embed : discord.Embed, type_set : set, sub_title : str):
+    def type_embed(embed: discord.Embed, types: list, abilities: list, sub_title: str):
         '''
         Takes an embed object as a parameter and then adds pokemon type emojis to it as a new field
         :param embed: discord.Embed
@@ -150,21 +152,25 @@ class Pokedex():
 
         #first get all the type info for the pokemon
         #for each type generate Weakness chart
-        z = dict()
-        print(type_set)
-        for t in type_set:
-            j = pb.type_(t)
-            y = {dt: [val.name for val in vals] for dt, vals in j.damage_relations \
-                 if 'from' in str(dt)}
-            y = {k: v for k, v in y.items() if v}
-            z.update(y)
+        # z = dict()
+        # print(type_set)
+        # for t in type_set:
+        #     j = pb.type_(t)
+        #     y = {dt: [val.name for val in vals] for dt, vals in j.damage_relations \
+        #          if 'from' in str(dt)}
+        #     y = {k: v for k, v in y.items() if v}
+        #     z.update(y)
+        #
+        # builder = ''
+        # for key in y:
+        #     builder += '{0}: {1}\n'.format(key.replace('_', ' '),
+        #                                  ' '.join({g.TYPE_DICT[t] for t in y[key] if t in g.TYPE_DICT}))
 
-        builder = ''
-        for key in y:
-            builder += '{0}: {1}\n'.format(key.replace('_', ' '),
-                                         ' '.join({g.TYPE_DICT[t] for t in y[key] if t in g.TYPE_DICT}))
 
-        embed.add_field(name=sub_title, value=builder)
+        type_dict = t.combine(t=types, a=abilities)
+        msg = t.build_dict(type_dict)
+
+        embed.add_field(name=sub_title, value=type_dict)
         return embed
 
 def setup(bot):

@@ -1,4 +1,6 @@
 import pokebase as pb
+from globals import Globals as g
+
 
 TYPE_DMG = {
     'normal':   [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.5, 0.0, 1.0, 1.0, 0.5, 1.0, 1.0],
@@ -37,7 +39,8 @@ ABILITY_MATRIX = {
     'wonder-guard': [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
     'none':         [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]}
 
-class Type():
+
+class PkmnTypes():
     def __init__(self):
         return
 
@@ -51,12 +54,12 @@ class Type():
         try:
             ret = TYPE_DMG[type1]
             if type2 and (type2 is not type1):
-                ret = Type.mult(TYPE_DMG[type1], TYPE_DMG[type2])
+                ret = PkmnTypes.mult(TYPE_DMG[type1], TYPE_DMG[type2])
             if a:
                 for ability in a:
                     if ability in ABILITY_MATRIX.keys():
-                        ret = Type.mult(ret, ABILITY_MATRIX[ability])
-            return Type.build_dict(ret)
+                        ret = PkmnTypes.mult(ret, ABILITY_MATRIX[ability])
+            return PkmnTypes.build_dict(ret)
         except Exception as e:
             print(t, e)
 
@@ -64,12 +67,6 @@ class Type():
     def build_dict(type_dmg):
         return dict(zip(TYPE_NAMES, type_dmg))
 
-def main():
-    bulba = pb.pokemon(87)
-    types = [x.type.name for x in bulba.types]
-    abilities = [x.ability.name for x in bulba.abilities]
-    print(Type.combine(t=types, a=abilities))
-    return
-
-if __name__ == "__main__":
-    main()
+    @staticmethod
+    def format_msg(type_dict):
+        return
