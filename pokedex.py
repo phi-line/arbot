@@ -10,7 +10,7 @@ import pokebase as pb
 from random import randint
 
 from globals import Globals as g
-from pkmnTypes import PkmnTypes as t
+from pkmnTypes import PkmnTypes as pt
 from exceptions import Rotom as rtm
 
 class Pokedex():
@@ -46,7 +46,7 @@ class Pokedex():
                 t = args[0]
                 if type(t) == str and t.startswith('-'):
                     if t in random_args:
-                        t = randint(Pokedex.MAX_PKMN)
+                        t = randint(1, Pokedex.MAX_PKMN)
                 if '-s' in args[1:] or '-shiny' in args[1:]:
                     shiny = True
                 if type(t) == int or type(t) == str:
@@ -149,28 +149,10 @@ class Pokedex():
         :param sub_title: string       - The string to set as the title of the new field
         :return: embed: discord.Embed  - A copy of the given embed object with the new field attatched
         '''
+        type_dict = pt.combine(t=types, a=abilities)
+        msg = pt.format_msg(type_dict)
 
-        #first get all the type info for the pokemon
-        #for each type generate Weakness chart
-        # z = dict()
-        # print(type_set)
-        # for t in type_set:
-        #     j = pb.type_(t)
-        #     y = {dt: [val.name for val in vals] for dt, vals in j.damage_relations \
-        #          if 'from' in str(dt)}
-        #     y = {k: v for k, v in y.items() if v}
-        #     z.update(y)
-        #
-        # builder = ''
-        # for key in y:
-        #     builder += '{0}: {1}\n'.format(key.replace('_', ' '),
-        #                                  ' '.join({g.TYPE_DICT[t] for t in y[key] if t in g.TYPE_DICT}))
-
-
-        type_dict = t.combine(t=types, a=abilities)
-        msg = t.build_dict(type_dict)
-
-        embed.add_field(name=sub_title, value=type_dict)
+        embed.add_field(name=sub_title, value=msg)
         return embed
 
 def setup(bot):
