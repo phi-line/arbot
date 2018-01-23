@@ -88,7 +88,7 @@ class Pokedex():
                     embed = discord.Embed(title=title, url=pkmn_url, color=g.COLOR)
                     embed.set_thumbnail(url=filename)
                     embed = this.std_embed(embed, species, sub_title)
-                    embed = this.type_embed(embed, types=pkmn_type, abilities=pkmn_abilities, sub_title='Type Chart:')
+                    embed = this.type_embed(embed, types=pkmn_type, abilities=pkmn_abilities, sub_title='Weak to:')
 
                     msg = await self.bot.say(embed=embed)
 
@@ -150,9 +150,20 @@ class Pokedex():
         :return: embed: discord.Embed  - A copy of the given embed object with the new field attatched
         '''
         type_dict = pt.combine(t=types, a=abilities)
-        msg = pt.format_msg(type_dict)
+        immunities, super_effective, hyper_effective = pt.get_weakness(type_dict)
 
-        embed.add_field(name=sub_title, value=msg)
+        if super_effective:
+            name = u"```{0} Super:```".format(u'\u2757')
+            value = ' '.join({g.TYPE_DICT[t] for t in super_effective if t in g.TYPE_DICT})
+            embed.add_field(name=name, value=value, inline=True)
+        if immunities:
+            name = u"```{0} Immune:```".format(u'\u274C')
+            value = ' '.join({g.TYPE_DICT[t] for t in immunities if t in g.TYPE_DICT})
+            embed.add_field(name=name, value=value, inline=True)
+        if hyper_effective:
+            name = u"```{0} Hyper:```".format(u'\u203C')
+            value = ' '.join({g.TYPE_DICT[t] for t in hyper_effective if t in g.TYPE_DICT})
+            embed.add_field(name=name, value=value, inline=False)
         return embed
 
 def setup(bot):
