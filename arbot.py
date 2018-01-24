@@ -5,6 +5,7 @@ from globals import Globals as g
 
 import traceback
 from datetime import datetime
+from random import seed
 
 description = '''An example arbot to showcase the discord.ext.commands extension
 module.
@@ -18,6 +19,7 @@ arbot = commands.Bot(command_prefix='>', description=description)
 
 @arbot.event
 async def on_ready():
+    seed(a=None)
     print('Logged in as')
     print(arbot.user.name)
     print('Servers: ' + ', '.join([str(s) for s in arbot.servers]))

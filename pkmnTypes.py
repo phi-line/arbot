@@ -71,15 +71,23 @@ class PkmnTypes():
 
     @staticmethod
     def get_weakness(matrix):
-        immunities = list()
+        inneffective = list()
+        not_very_effective = list()
+        not_effective = list()
         super_effective = list()
         hyper_effective = list()
+
         for i, val in enumerate(matrix):
-            if matrix[val] == 0: immunities.append(TYPE_NAMES[i])
-            if matrix[val] > 1:
+            if matrix[val] == 0: inneffective.append(TYPE_NAMES[i])
+            elif matrix[val] > 1:
                 if matrix[val] > 2:
                     hyper_effective.append(TYPE_NAMES[i])
                 else:
                     super_effective.append(TYPE_NAMES[i])
+            elif matrix[val] < 1:
+                if matrix[val] < 0.5:
+                    not_very_effective.append(TYPE_NAMES[i])
+                else:
+                    not_effective.append(TYPE_NAMES[i])
 
-        return immunities, super_effective, hyper_effective
+        return inneffective, not_very_effective, not_effective, super_effective, hyper_effective

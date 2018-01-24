@@ -16,7 +16,6 @@ from exceptions import Rotom as rtm
 class Pokedex():
     def __init__(self, bot):
         self.bot = bot
-        self.lock = False
 
     DEX_USAGE = "Pokémon must be from Gen I - VI\n" \
                 "```Args :\n" \
@@ -35,78 +34,109 @@ class Pokedex():
         Usage: !dex [pkmn # or name]
         e.g:   !dex 151 / !dex mew
         '''
-        from pokedex import Pokedex as this
-        dex_usage = this.DEX_USAGE.format(self.bot.command_prefix)
+        dex_usage = Pokedex.DEX_USAGE.format(self.bot.command_prefix)
         pkmn_id = 0; pkmn_name = ''; pkmn_genus = ''; pkmn_url = ''; pkmn_desc = '';
         random_args = ['-r', '-rand', '-random']
         shiny = False
 
-        if not self.lock:
-            if args and len(args) >= 1:
-                t = args[0]
-                if type(t) == str and t.startswith('-'):
-                    if t in random_args:
-                        t = randint(1, Pokedex.MAX_PKMN)
-                if '-s' in args[1:] or '-shiny' in args[1:]:
-                    shiny = True
-                if type(t) == int or type(t) == str:
-                    self.lock = True
-                    if type(t) == str:
-                        t = t.lower()
+        if args and len(args) >= 1:
+            t = args[0]
+            if type(t) == str and t.startswith('-'):
+                if t in random_args:
+                    t = randint(1, Pokedex.MAX_PKMN)
+            if '-s' in args[1:] or '-shiny' in args[1:]:
+                shiny = True
+            if type(t) == int or type(t) == str:
+                if type(t) == str:
+                    t = t.lower()
 
-                    try:
-                        species = pb.pokemon_species(t)
-                        pokemon = pb.pokemon(t)
-                    except ValueError:
-                        console_txt = 'Invalid Pokémon: ' + str(t) + ' given'
-                        print(console_txt)
+                try:
+                    species = pb.pokemon_species(t)
+                    pokemon = pb.pokemon(t)
+                except ValueError:
+                    console_txt = 'Invalid Pokémon: ' + str(t) + ' given'
+                    print(console_txt)
 
-                        title = 'What the zzzt?! Invalid Pokémon name / ID'
-                        msg = await self.bot.say(embed=rtm.rotom_embed(title,dex_usage))
-
-                        self.lock = False
-                        return
-
-                    pkmn_id = species.id
-                    pkmn_name = species.name
-
-                    pkmn_genus = species.genera[2].genus
-                    pkmn_url = 'https://veekun.com/dex/pokemon/' + pkmn_name
-                    # print("Displaying Pokemon {0} #{1}".format(pkmn_name, pkmn_id))
-
-                    filename = self.get_thumbnail(pkmn_id, pkmn_name, shiny=shiny)
-
-                    pkmn_type = [x.type.name for x in pokemon.types]
-                    pkmn_abilities = [x.ability.name for x in pokemon.abilities]
-                    type_emojis = ' '.join({g.TYPE_DICT[t] for t in pkmn_type if t in g.TYPE_DICT})
-
-                    if shiny: type_emojis += g.S_ICON
-
-                    title = "{0} #{1} {2}".format(pkmn_name.capitalize(), pkmn_id, type_emojis)
-                    sub_title = "the {0}".format(pkmn_genus)
-
-                    embed = discord.Embed(title=title, url=pkmn_url, color=g.COLOR)
-                    embed.set_thumbnail(url=filename)
-                    embed = this.std_embed(embed, species, sub_title)
-                    embed = this.type_embed(embed, types=pkmn_type, abilities=pkmn_abilities, sub_title='Weak to:')
-
-                    msg = await self.bot.say(embed=embed)
-
-                    self.lock = False
+                    title = 'What the zzzt?! Invalid Pokémon name / ID'
+                    msg = await self.bot.say(embed=rtm.rotom_embed(title,dex_usage))
                     return
-            else:
-                title = 'Kzzzzrrt?! Invalid usage! Zzt-zzt!'
-                msg = await self.bot.say(embed=rtm.rotom_embed(title,dex_usage))
+
+                pkmn_id = species.id
+                pkmn_name = species.name
+
+                filename = self.get_thumbnail(pkmn_id, pkmn_name, shiny=shiny)
+
+                pkmn_genus = species.genera[2].genus
+                pkmn_url = 'https://veekun.com/dex/pokemon/' + pkmn_name
+                # print("Displaying Pokemon {0} #{1}".format(pkmn_name, pkmn_id))
+
+                pkmn_type = [x.type.name for x in pokemon.types]
+                pkmn_abilities = [x.ability.name for x in pokemon.abilities]
+                type_emojis = ' '.join({g.TYPE_DICT[t] for t in pkmn_type if t in g.TYPE_DICT})
+
+                if shiny: type_emojis += g.S_ICON
+
+                title = "{0} #{1} {2}".format(pkmn_name.capitalize(), pkmn_id, type_emojis)
+                sub_title = "the {0}".format(pkmn_genus)
+
+                embed = discord.Embed(title=title, url=pkmn_url, color=g.COLOR)
+                embed.set_thumbnail(url=filename)
+                embed = Pokedex.std_embed(embed, species, sub_title)
+                embed = Pokedex.type_embed(embed, types=pkmn_type, abilities=pkmn_abilities, sub_title='Weak to:')
+
+                msg = await self.bot.say(embed=embed)
                 return
         else:
-            print("The dex is currently in use")
+            title = 'Kzzzzrrt?! Invalid usage! Zzt-zzt!'
+            msg = await self.bot.say(embed=rtm.rotom_embed(title,dex_usage))
+            return
+        return
+
+    @commands.command(pass_context=True)
+    async def gif(self, ctx, *args):
+        dex_usage = Pokedex.DEX_USAGE.format(self.bot.command_prefix)
+        pkmn_id = 0; pkmn_name = ''; pkmn_genus = ''; pkmn_url = ''; pkmn_desc = '';
+        random_args = ['-r', '-rand', '-random']
+        shiny = False
+
+        if args and len(args) >= 1:
+            t = args[0]
+            if type(t) == str and t.startswith('-'):
+                if t in random_args:
+                    t = randint(1, Pokedex.MAX_PKMN)
+            if '-s' in args[1:] or '-shiny' in args[1:]:
+                shiny = True
+            if type(t) == int or type(t) == str:
+                if type(t) == str:
+                    t = t.lower()
+
+                try:
+                    species = pb.pokemon_species(t)
+                except ValueError:
+                    console_txt = 'Invalid Pokémon: ' + str(t) + ' given'
+                    print(console_txt)
+
+                    title = 'What the zzzt?! Invalid Pokémon name / ID'
+                    msg = await self.bot.say(embed=rtm.rotom_embed(title, dex_usage))
+                    return
+
+                pkmn_id = species.id
+                pkmn_name = species.name
+                pkmn_url = 'https://pokemondb.net/sprites/' + pkmn_name
+
+                title = "{0} #{1}".format(pkmn_name.capitalize(), pkmn_id)
+                embed = discord.Embed(title=title, url=pkmn_url, color=g.COLOR)
+                filename = self.get_thumbnail(pkmn_id, pkmn_name, shiny=shiny)
+                embed.set_thumbnail(url=filename)
+
+                msg = await self.bot.say(embed=embed)
         return
 
     @staticmethod
-    def get_thumbnail(id: int, name: str, shiny=False):
+    def get_thumbnail(i: int, name: str, shiny=False):
         '''
         This function returns a hotlink of the Pokemon's
-        :param id: int     - the pokemon's id
+        :param i: int     - the pokemon's id
         :param name: str   - the pokemon's name
         :param shiny: bool - get shiny thumbnail?
         :return: filename: string - hotlink of the requested thumbnail
@@ -121,8 +151,8 @@ class Pokedex():
             a = urlopen(filename)
         except HTTPError:
             if not shiny:
-                filename = ''.join((g.IMG_URL, str(id), '.png'))
-            else: filename = ''.join((g.S_IMG_URL, str(id), '.png'))
+                filename = ''.join((g.IMG_URL, str(i), '.png'))
+            else: filename = ''.join((g.S_IMG_URL, str(i), '.png'))
         finally:
             return filename
 
@@ -150,20 +180,32 @@ class Pokedex():
         :return: embed: discord.Embed  - A copy of the given embed object with the new field attatched
         '''
         type_dict = pt.combine(t=types, a=abilities)
-        immunities, super_effective, hyper_effective = pt.get_weakness(type_dict)
+        inneffective, not_very_effective, not_effective, super_effective, hyper_effective = pt.get_weakness(type_dict)
 
-        if super_effective:
-            name = u"```{0} Super:```".format(u'\u2757')
-            value = ' '.join({g.TYPE_DICT[t] for t in super_effective if t in g.TYPE_DICT})
+        if super_effective or hyper_effective:
+            name = 'Weakness:'
+            value = str()
+            if super_effective:
+                value += u"`{0} 2x`\n{1}\n".format(
+                    u'❓', ' '.join({g.TYPE_DICT[t] for t in super_effective if t in g.TYPE_DICT}))
+            if hyper_effective:
+                value += u"`{0} 4x`\n{1}\n".format(
+                    u'❗', ' '.join({g.TYPE_DICT[t] for t in hyper_effective if t in g.TYPE_DICT}))
             embed.add_field(name=name, value=value, inline=True)
-        if immunities:
-            name = u"```{0} Immune:```".format(u'\u274C')
-            value = ' '.join({g.TYPE_DICT[t] for t in immunities if t in g.TYPE_DICT})
+
+        if inneffective or not_effective or not_very_effective:
+            name = 'Resistance:'
+            value = str()
+            if inneffective:
+                value += u"`{0} Immune`\n{1}\n".format(
+                    u'⛔', ' '.join({g.TYPE_DICT[t] for t in inneffective if t in g.TYPE_DICT}))
+            if not_effective:
+                value += u"`{0} ½x`\n{1}\n".format(
+                    u'⭕', ' '.join({g.TYPE_DICT[t] for t in not_effective if t in g.TYPE_DICT}))
+            if not_very_effective:
+                value += u"`{0} ¼x`\n{1}\n".format(
+                    u'🚫', ' '.join({g.TYPE_DICT[t] for t in not_very_effective if t in g.TYPE_DICT}))
             embed.add_field(name=name, value=value, inline=True)
-        if hyper_effective:
-            name = u"```{0} Hyper:```".format(u'\u203C')
-            value = ' '.join({g.TYPE_DICT[t] for t in hyper_effective if t in g.TYPE_DICT})
-            embed.add_field(name=name, value=value, inline=False)
         return embed
 
 def setup(bot):
