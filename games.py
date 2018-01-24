@@ -66,6 +66,7 @@ class Games():
             timeout = 0
             while timeout < Games.TIME:
                 diff = (Games.TIME - timeout) / 1000
+                await self.bot.edit_message(timer_msg, new_content='You have {:.2f} seconds to guess'.format(diff))
                 guess = await self.bot.wait_for_message(timeout=diff, check=check)
                 if check_guess(guess):
                     end_msg = 'You win!'
@@ -75,7 +76,6 @@ class Games():
                     diff = (Games.TIME - timeout)/1000
 
                     end_msg = 'You Lose!'
-                    await self.bot.edit_message(timer_msg, new_content='You have {:.2f} seconds to guess'.format(diff))
 
             g.IS_BOT and await self.bot.delete_messages((intro_msg, kuro_img, timer_msg))
 

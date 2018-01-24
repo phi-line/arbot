@@ -25,6 +25,14 @@ class Pokedex():
                 "e.g  : {0}dex 151 / {0}dex mew\n" \
                 "       {0}dex -random -shiny```"
 
+    GIF_USAGE = "Pokémon must be from Gen I - VI\n" \
+                "```Args :\n" \
+                "Random Pokémon -r / -random\n" \
+                "Shiny  Pokémon -s / -shiny\n\n" \
+                "Usage: {0}gif [p1] / '-r' ('-s')\n" \
+                "e.g  : {0}gif 151 / {0}dex mew\n" \
+                "       {0}gif -random -shiny```"
+
     MAX_PKMN = 721
 
     @commands.command(pass_context=True)
@@ -120,13 +128,11 @@ class Pokedex():
                     msg = await self.bot.say(embed=rtm.rotom_embed(title, dex_usage))
                     return
 
-                pkmn_id = species.id
                 pkmn_name = species.name
                 pkmn_url = 'https://pokemondb.net/sprites/' + pkmn_name
-
-                title = "{0} #{1}".format(pkmn_name.capitalize(), pkmn_id)
-                embed = discord.Embed(title=title, url=pkmn_url, color=g.COLOR)
                 filename = self.get_thumbnail(pkmn_id, pkmn_name, shiny=shiny)
+
+                embed = discord.Embed(url=pkmn_url, color=g.COLOR)
                 embed.set_thumbnail(url=filename)
 
                 msg = await self.bot.say(embed=embed)
