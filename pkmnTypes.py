@@ -1,7 +1,3 @@
-import pokebase as pb
-from globals import Globals as g
-
-
 TYPE_DMG = {
     'normal':   [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0],
     'fire':     [1.0, 0.5, 2.0, 1.0, 0.5, 0.5, 1.0, 1.0, 2.0, 1.0, 1.0, 0.5, 2.0, 1.0, 1.0, 1.0, 0.5, 0.5, 1.0],
@@ -91,3 +87,7 @@ class PkmnTypes():
                     not_effective.append(TYPE_NAMES[i])
 
         return inneffective, not_very_effective, not_effective, super_effective, hyper_effective
+
+    @staticmethod
+    def get_types():
+        return TYPE_NAMES

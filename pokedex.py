@@ -33,6 +33,10 @@ class Pokedex():
                 "e.g  : {0}gif 151 / {0}dex mew\n" \
                 "       {0}gif -random -shiny```"
 
+    TYPE_USAGE = "Types must be \n" \
+                "Usage: {0}type [t1] or [t2]\n" \
+                "e.g  : {0}type water/ {0}type water fire\n" \
+
     MAX_PKMN = 721
 
     @commands.command(pass_context=True)
@@ -90,7 +94,7 @@ class Pokedex():
                 embed = discord.Embed(title=title, url=pkmn_url, color=g.COLOR)
                 embed.set_thumbnail(url=filename)
                 embed = Pokedex.std_embed(embed, species, sub_title)
-                embed = Pokedex.type_embed(embed, types=pkmn_type, abilities=pkmn_abilities, sub_title='Weak to:')
+                embed = Pokedex.type_embed(embed, types=pkmn_type, abilities=pkmn_abilities)
 
                 msg = await self.bot.say(embed=embed)
                 return
@@ -102,7 +106,7 @@ class Pokedex():
 
     @commands.command(pass_context=True)
     async def gif(self, ctx, *args):
-        dex_usage = Pokedex.DEX_USAGE.format(self.bot.command_prefix)
+        dex_usage = Pokedex.GIF_USAGE.format(self.bot.command_prefix)
         pkmn_id = 0; pkmn_name = ''; pkmn_genus = ''; pkmn_url = ''; pkmn_desc = '';
         random_args = ['-r', '-rand', '-random']
         shiny = False
@@ -121,9 +125,6 @@ class Pokedex():
                 try:
                     species = pb.pokemon_species(t)
                 except ValueError:
-                    console_txt = 'Invalid Pokémon: ' + str(t) + ' given'
-                    print(console_txt)
-
                     title = 'What the zzzt?! Invalid Pokémon name / ID'
                     msg = await self.bot.say(embed=rtm.rotom_embed(title, dex_usage))
                     return
@@ -137,6 +138,34 @@ class Pokedex():
 
                 msg = await self.bot.say(embed=embed)
         return
+
+    @commands.command(pass_context=True)
+    async def type(self, ctx, *args):
+        type_usage = Pokedex.TYPE_USAGE.format(self.bot.command_prefix)
+        try:
+            if len(args) > 2 or len(args) < 1:
+                raise ValueError
+            for t in args:
+                t = t.lower()
+                if type(t) != str:
+                    raise ValueError
+                names = pt.get_types()
+                if t not in names:
+                    raise ValueError
+            pkmn_type = list(set(args))
+        except ValueError:
+            title = 'What the zzzt?! Invalid Type selection'
+            msg = await self.bot.say(embed=rtm.rotom_embed(title, type_usage))
+            return
+        else:
+            title = ' '.join({g.TYPE_DICT[t] for t in pkmn_type if t in g.TYPE_DICT})
+
+            embed = discord.Embed(title=title, color=g.COLOR)
+            embed = Pokedex.type_embed(embed, types=pkmn_type)
+
+            msg = await self.bot.say(embed=embed)
+            return
+
 
     @staticmethod
     def get_thumbnail(i: int, name: str, shiny=False):
@@ -177,7 +206,7 @@ class Pokedex():
         return embed
 
     @staticmethod
-    def type_embed(embed: discord.Embed, types: list, abilities: list, sub_title: str):
+    def type_embed(embed: discord.Embed, types: list, abilities: list=None):
         '''
         Takes an embed object as a parameter and then adds pokemon type emojis to it as a new field
         :param embed: discord.Embed
@@ -189,28 +218,28 @@ class Pokedex():
         inneffective, not_very_effective, not_effective, super_effective, hyper_effective = pt.get_weakness(type_dict)
 
         if super_effective or hyper_effective:
-            name = 'Weakness:'
+            name = '__Weakness__:'
             value = str()
             if super_effective:
-                value += u"`{0} 2x`\n{1}\n".format(
-                    u'❓', ' '.join({g.TYPE_DICT[t] for t in super_effective if t in g.TYPE_DICT}))
+                value += "{0} 2x\n{1}\n".format(
+                    ':exclamation:', ' '.join({g.TYPE_DICT[t] for t in super_effective if t in g.TYPE_DICT}))
             if hyper_effective:
-                value += u"`{0} 4x`\n{1}\n".format(
-                    u'❗', ' '.join({g.TYPE_DICT[t] for t in hyper_effective if t in g.TYPE_DICT}))
+                value += "{0} 4x\n{1}\n".format(
+                    ':bangbang:', ' '.join({g.TYPE_DICT[t] for t in hyper_effective if t in g.TYPE_DICT}))
             embed.add_field(name=name, value=value, inline=True)
 
         if inneffective or not_effective or not_very_effective:
-            name = 'Resistance:'
+            name = '__Resistance__:'
             value = str()
             if inneffective:
-                value += u"`{0} Immune`\n{1}\n".format(
-                    u'⛔', ' '.join({g.TYPE_DICT[t] for t in inneffective if t in g.TYPE_DICT}))
+                value += "{0} Immune\n{1}\n".format(
+                    ':no_entry:', ' '.join({g.TYPE_DICT[t] for t in inneffective if t in g.TYPE_DICT}))
             if not_effective:
-                value += u"`{0} ½x`\n{1}\n".format(
-                    u'⭕', ' '.join({g.TYPE_DICT[t] for t in not_effective if t in g.TYPE_DICT}))
+                value += "{0} ½x\n{1}\n".format(
+                    ':o:', ' '.join({g.TYPE_DICT[t] for t in not_effective if t in g.TYPE_DICT}))
             if not_very_effective:
-                value += u"`{0} ¼x`\n{1}\n".format(
-                    u'🚫', ' '.join({g.TYPE_DICT[t] for t in not_very_effective if t in g.TYPE_DICT}))
+                value += "{0} ¼x\n{1}\n".format(
+                    ':no_entry_sign:', ' '.join({g.TYPE_DICT[t] for t in not_very_effective if t in g.TYPE_DICT}))
             embed.add_field(name=name, value=value, inline=True)
         return embed
 
