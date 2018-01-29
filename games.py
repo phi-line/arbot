@@ -96,6 +96,8 @@ class Games():
                  "e.g  : {0}fuse arbok ditto / {0}fuse ditto 25\n" \
                  "       {0}fuse -r pikachu / {0}fuse 132 -r```"
 
+    CLARENCE = 'https://raw.githubusercontent.com/phi-line/arbot/master/clarence.png'
+
 
     @commands.command()
     async def fuse(self, p1=None, p2=None):
@@ -108,6 +110,11 @@ class Games():
         from games import Games as this
         fuse_usage = this.FUSE_USAGE.format(self.bot.command_prefix)
         random_args = ['-r', '-rand', '-random']; r = False
+        if p1.lower() == 'clarence':
+            embed = discord.Embed(title='be strong clarence', description='be strong for mother', color=g.COLOR)
+            embed.set_image(url=Games.CLARENCE)
+            msg = await self.bot.say(embed=embed)
+            return
         if p1 and not p2:
             if p1 in random_args:
                 p1 = randint(1,151)
